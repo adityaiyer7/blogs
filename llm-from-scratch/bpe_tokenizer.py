@@ -3,7 +3,7 @@ class ByteBPE:
     def __init__(self, corpus):
         self.vocab = [x for x in range(256)]
         self.corpus = list(corpus.encode("utf-8")) #text.encode(utf-8) gives us the byte stream, converting it into a list gives us the decimal representation
-        self.decode_vocab = {x: bytes([x]) for x in range(256)} # bytes gives an immutable sequence of bytes (byte stream)
+        self.decode_vocab = {x: bytes([x]) for x in range(256)} # mappiing of token (int) to byte sequence; bytes gives an immutable sequence of bytes (byte stream)
         self.merges = {}
         self.vocab_threshold = 1500
     
