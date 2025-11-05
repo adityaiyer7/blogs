@@ -1,5 +1,5 @@
 from collections import Counter
-class byteBPE:
+class ByteBPE:
     def __init__(self, corpus):
         self.vocab = [x for x in range(256)]
         self.corpus = list(corpus.encode("utf-8")) #text.encode(utf-8) gives us the byte stream, converting it into a list gives us the decimal representation
@@ -7,6 +7,7 @@ class byteBPE:
         self.merges = {}
         self.vocab_threshold = 1500
     
+    # training phase starts here
     def split_corpus(self, max_byte_one, max_byte_two, merged_byte):
         skip_indices = set()
         for idx in range(len(self.corpus) - 1):
@@ -56,11 +57,42 @@ class byteBPE:
 
             self.split_corpus(max_byte_one, max_byte_two, merged_byte)
 
+    # training ends starts here
 
-    def encode(self):
-        pass
+    def apply_merges(self,split_text):
+        for (max_byte_one, max_byte_two), merged_byte in self.merges.items():
+            skip_indices = set()
+            for idx in range(len(split_text) - 1):
+                byte_one = split_text[idx]
+                byte_two = split_text[idx + 1]
 
-    def decode(self):
-        pass
+                if byte_one == max_byte_one and byte_two == max_byte_two:
+                    skip_indices.add(idx)
+                    split_text[idx + 1] = merged_byte
+            
+            new_text = []
+            for idx in range(len(split_text)):
+                if idx in skip_indices:
+                    continue
+                else:
+                    new_text.append(split_text[idx])
+            split_text = new_text
+        return split_text
+
+    def encode(self, text):
+        split_text = list(text.encode("utf-8"))
+        token_list = self.apply_merges(split_text) # returns a list
+        return token_list
+
+
+    def decode(self, token_list):
+        byte_lst = []
+
+        for token in token_list:
+            byte_lst.append(self.decode_vocab[token])
+
+
+        byte_lst_joined = b''.join(byte_lst)
+        return byte_lst_joined.decode("utf-8")
     
 
