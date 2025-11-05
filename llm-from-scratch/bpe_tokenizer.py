@@ -1,5 +1,5 @@
 from collections import Counter
-class ByteBPE:
+class ByteBPEv1:
     def __init__(self, corpus):
         self.vocab = [x for x in range(256)]
         self.corpus = list(corpus.encode("utf-8")) #text.encode(utf-8) gives us the byte stream, converting it into a list gives us the decimal representation
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     print(f"Training corpus bytes: {len(corpus.encode('utf-8'))} bytes\n")
     
     # Initialize and train the tokenizer
-    tokenizer = ByteBPE(corpus)
+    tokenizer = ByteBPEv1(corpus)
     print("Building vocabulary...")
     tokenizer.build_vocab()
     print("Training complete!\n")
