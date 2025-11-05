@@ -96,3 +96,82 @@ class ByteBPE:
         return byte_lst_joined.decode("utf-8")
     
 
+if __name__ == "__main__":
+    # Define a training corpus with repeated patterns
+    corpus = """
+    The quick brown fox jumps over the lazy dog. The quick brown fox is very quick.
+    Machine learning is fascinating. Machine learning models learn from data.
+    Python is a great programming language. Python makes coding easier.
+    The cat sat on the mat. The cat likes the warm mat.
+    Hello world! Hello everyone in the world!
+    """
+    
+    print("=" * 60)
+    print("TRAINING BPE TOKENIZER")
+    print("=" * 60)
+    print(f"\nTraining corpus length: {len(corpus)} characters")
+    print(f"Training corpus bytes: {len(corpus.encode('utf-8'))} bytes\n")
+    
+    # Initialize and train the tokenizer
+    tokenizer = ByteBPE(corpus)
+    print("Building vocabulary...")
+    tokenizer.build_vocab()
+    print("Training complete!\n")
+    
+    # Print vocabulary information
+    print("=" * 60)
+    print("VOCABULARY INFORMATION")
+    print("=" * 60)
+    print(f"Final vocab size: {len(tokenizer.vocab)}")
+    print(f"Number of merges learned: {len(tokenizer.merges)}")
+    print(f"\nFirst 20 learned merges:")
+    print("-" * 60)
+    
+    for i, ((byte1, byte2), merged) in enumerate(list(tokenizer.merges.items())[:20]):
+        # Try to decode the bytes for display
+        try:
+            char1 = tokenizer.decode_vocab[byte1].decode('utf-8', errors='replace')
+            char2 = tokenizer.decode_vocab[byte2].decode('utf-8', errors='replace')
+            merged_str = tokenizer.decode_vocab[merged].decode('utf-8', errors='replace')
+            print(f"{i+1}. ({byte1}, {byte2}) -> {merged} | '{char1}' + '{char2}' = '{merged_str}'")
+        except:
+            print(f"{i+1}. ({byte1}, {byte2}) -> {merged}")
+    
+    # Test encode/decode methods
+    print("\n" + "=" * 60)
+    print("ENCODE/DECODE TESTS")
+    print("=" * 60)
+    
+    test_strings = [
+        "The quick brown fox",
+        "Machine learning",
+        "Hello world!",
+        "Python programming",
+        "This is a new sentence not in the corpus"
+    ]
+    
+    for i, test_text in enumerate(test_strings, 1):
+        print(f"\nTest {i}:")
+        print("-" * 60)
+        print(f"Original text: '{test_text}'")
+        
+        # Encode
+        encoded = tokenizer.encode(test_text)
+        print(f"Encoded tokens: {encoded}")
+        print(f"Number of tokens: {len(encoded)}")
+        
+        # Decode
+        decoded = tokenizer.decode(encoded)
+        print(f"Decoded text: '{decoded}'")
+        
+        # Compression ratio
+        original_bytes = len(test_text.encode('utf-8'))
+        num_tokens = len(encoded)
+        compression_ratio = original_bytes / num_tokens if num_tokens > 0 else 0
+        print(f"Original bytes: {original_bytes}, Tokens: {num_tokens}")
+        print(f"Compression ratio: {compression_ratio:.2f}x")
+        print(f"Match: {decoded == test_text}")
+    
+    print("\n" + "=" * 60)
+    print("TESTING COMPLETE")
+    print("=" * 60)
