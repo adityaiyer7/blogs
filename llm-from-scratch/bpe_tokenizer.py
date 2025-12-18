@@ -1,6 +1,12 @@
 from collections import Counter
 class ByteBPEv1:
     def __init__(self, corpus):
+        """
+        Initializes the ByteBPEv1 tokenizer.
+
+        Args:
+            corpus (str): The text corpus used to train the tokenizer.
+        """
         self.vocab = [x for x in range(256)]
         self.corpus = list(corpus.encode("utf-8")) #text.encode(utf-8) gives us the byte stream, converting it into a list gives us the decimal representation
         self.decode_vocab = {x: bytes([x]) for x in range(256)} # mappiing of token (int) to byte sequence; bytes gives an immutable sequence of bytes (byte stream)
@@ -9,6 +15,15 @@ class ByteBPEv1:
     
     # training phase starts here
     def split_corpus(self, max_byte_one, max_byte_two, merged_byte):
+        """
+        Updates the corpus by replacing all occurrences of the most frequent pair 
+        (max_byte_one, max_byte_two) with the new merged_byte.
+
+        Args:
+            max_byte_one (int): The first byte/token of the pair to merge.
+            max_byte_two (int): The second byte/token of the pair to merge.
+            merged_byte (int): The new token ID representing the merged pair.
+        """
         skip_indices = set()
         for idx in range(len(self.corpus) - 1):
             byte_one = self.corpus[idx]
@@ -28,6 +43,12 @@ class ByteBPEv1:
 
     
     def build_pairs(self):
+        """
+        Iterates through the current corpus to collect all adjacent token pairs.
+
+        Returns:
+            list: A list of tuples, where each tuple contains two adjacent tokens.
+        """
         pairs = []
         for idx in range(len(self.corpus) - 1):
             byte_one = self.corpus[idx]
@@ -38,6 +59,10 @@ class ByteBPEv1:
         return pairs
 
     def build_vocab(self):
+        """
+        Trains the tokenizer by iteratively merging the most frequent token pairs
+        until the vocabulary size reaches the threshold.
+        """
         while len(self.vocab) < self.vocab_threshold:
             pairs = self.build_pairs()
             frequency_counter = Counter(pairs)
@@ -57,9 +82,18 @@ class ByteBPEv1:
 
             self.split_corpus(max_byte_one, max_byte_two, merged_byte)
 
-    # training ends starts here
+    # training ends here
 
     def apply_merges(self,split_text):
+        """
+        Applies the learned merge rules to a sequence of tokens.
+
+        Args:
+            split_text (list): A list of initial tokens (bytes) representing the text.
+
+        Returns:
+            list: The list of tokens after applying all learned merges.
+        """
         for (max_byte_one, max_byte_two), merged_byte in self.merges.items():
             skip_indices = set()
             for idx in range(len(split_text) - 1):
@@ -80,12 +114,30 @@ class ByteBPEv1:
         return split_text
 
     def encode(self, text):
+        """
+        Encodes a given text string into a list of BPE tokens.
+
+        Args:
+            text (str): The input text to encode.
+
+        Returns:
+            list: A list of integer tokens representing the encoded text.
+        """
         split_text = list(text.encode("utf-8"))
         token_list = self.apply_merges(split_text) # returns a list
         return token_list
 
 
     def decode(self, token_list):
+        """
+        Decodes a list of BPE tokens back into a string.
+
+        Args:
+            token_list (list): A list of integer tokens to decode.
+
+        Returns:
+            str: The decoded text string.
+        """
         byte_lst = []
 
         for token in token_list:
