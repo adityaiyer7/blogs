@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "",
-    "section": "",
-    "text": "SAE for monosemanticity\n\n\n\nInterpretability\n\n\n\nBrief description of the post.\n\n\n\n\n\nMar 29, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "posts/sae-for-monosemanticity/index.html",
     "href": "posts/sae-for-monosemanticity/index.html",
     "title": "SAE for monosemanticity",
@@ -103,5 +96,12 @@
     "title": "SAE for monosemanticity",
     "section": "Feature Extraction (Sampling)",
     "text": "Feature Extraction (Sampling)\n\n\n\nLambda/Expansion Factor\n4x\n8x\n16x\n32x\n\n\n\n\n1e-2\nHF RepoWandB Run\nHF RepoWandB Run\nHF RepoWandB Run\nHF RepoWandB Run\n\n\n1e-4\nHF RepoWandB Run\nHF RepoWandB Run\nHF RepoWandB Run\nHF RepoWandB Run"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blogs",
+    "section": "",
+    "text": "SAE for monosemanticity\n\n\n\nInterpretability\n\n\n\nBrief description of the post.\n\n\n\n\n\nMar 29, 2026\n\n\n\n\n\nNo matching items"
   }
 ]
