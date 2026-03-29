@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Blogs</title>
+<link>https://adityaiyer7.github.io/blogs/</link>
+<atom:link href="https://adityaiyer7.github.io/blogs/index.xml" rel="self" type="application/rss+xml"/>
+<description>Notes on mechanistic interpretability and machine learning.</description>
+<generator>quarto-1.9.29</generator>
+<lastBuildDate>Sun, 29 Mar 2026 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>SAE for monosemanticity</title>
+  <link>https://adityaiyer7.github.io/blogs/posts/sae-for-monosemanticity/</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>Before diving into the experiment and the results, I want to take some time to build up the story and motivate why we’re doing this. Specifically, I want to touch on what the main question is, and some useful concepts that’ll help us along the way. ## How do models represent information?</p>
+<section id="linear-models" class="level3">
+<h3 class="anchored" data-anchor-id="linear-models">Linear Models</h3>
+<p>Before we answer this question for more complicated models like Neural Networks, let’s take a look at (relatively) simpler models like Linear Models. In linear models (e.g., linear regression), each feature is assigned its own dimension. Borrowing from a canonical linear regression example, if you’re trying to predict house prices using 5 features, say number of bedrooms, walking score, year of construction, neighborhood, and square feet, then each of your data points gets embedded in a 5-dimensional space where a feature is represented by a basis direction (the basis is orthogonal). Our initial representation looks something like this</p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%20w_1x_1%20+%20w_2x_2%20+%20w_3x_3%20+%20w_4x_4%20+%20w_5x_5"></p>
+<p>In this representation, each <img src="https://latex.codecogs.com/png.latex?w_i"> tells us how much importance to give to each feature <img src="https://latex.codecogs.com/png.latex?x_i"></p>
+<p>However, in this simplistic model, we fail to account for bias, so our line must pass through the origin (this is restrictive, as you might imagine). To fix this, we add a bias term (all 1’s) so our hyperplane can move freely, leading to the result</p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%20w_1x_1%20+%20w_2x_2%20+%20w_3x_3%20+%20w_4x_4%20+%20w_5x_5%20+%20w_6*1"></p>
+<p>Note that this now becomes a representation in 6 dimensions (the 6th dimension is just all 1’s), or more canonically, we write <img src="https://latex.codecogs.com/png.latex?%5Csum_%7Bi=1%7D%5E%7B5%7D%20w_i%20x_i%20+%20b"> where <img src="https://latex.codecogs.com/png.latex?w_6%20=%20b">.</p>
+<p>This is a long winded way of saying that in linear models, we have the luxury of giving each feature its own dimension. This is possible to do because linear models get hand crafted features as input, but how do you hand craft features for things like images, audio, text etc? This is an incredibly difficult thing to do in practice! This is where more modern methods like Neural Networks come in. We’re able to pass in raw real world data (with some pre-processing of course) and have them work incredibly well! This is what makes them so versatile, but also so much harder (and interesting!) to study. This begs the question how the hell are they actually storing information?</p>
+</section>
+<section id="neural-network-basics" class="level3">
+<h3 class="anchored" data-anchor-id="neural-network-basics">Neural Network Basics</h3>
+<p>Before we go into the specifics of Neural Network Interpretability, it’s worth reviewing some of the basic terminology associated with neural networks (this will save us pain in the future).</p>
+<ol type="1">
+<li><strong>Neuron</strong>: A neuron is a computational unit, that takes in a weighted sum of inputs, and passes it through a non linearity. Non linearities are what make neural networks so powerful and versatile. Without this, they’d be just a composition of linear transformations. These non linear functions are also called activation functions, and the output of a layer of a neural network is called an activation vector.</li>
+<li><strong>Weights</strong>: This is analogous to our linear regression example, it tells us how much to weight each input (or each component of a vector)</li>
+<li><strong>Bias</strong>: Similar to the linear regression case, this helps serve as an offset. There is also some study done on how bias affects feature alignment, but this is still in early stages, and as far as I’m aware is only applicable for toy models. ==Regardless, its an interesting read.==</li>
+<li><strong>Features</strong>: I think the notion of a feature is somewhat ambiguous when it comes to neural networks, which is one of the significant pain points of neural network interpretability. But, for the purposes of this blog, we follow the same convention used by ==Anthropic Papers==, and say a feature is a direction in activation space (activation space, is just the vector space where the activation vector lives). This definition is non trivial and implicitly assumes that the ==linear representation hypothesis== is true.</li>
+</ol>
+<p>=={Insert diagram of canonical neural network}==</p>
+<p>The following sections heavily borrow from these two papers: 1. <a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a> 2. <a href="https://transformer-circuits.pub/2023/monosemantic-features">Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.</a></p>
+<p>I have picked some important terminology for the purposes of this blog. However, there are several nuances that I don’t cover in detail (if at all) to avoid repeating information, but I highly recommend reading them.</p>
+</section>
+<section id="superposition" class="level2">
+<h2 class="anchored" data-anchor-id="superposition">Superposition</h2>
+<p>==In linear models, we were able to allocate a dimension to each feature, but this is limiting in some sense - if we want to represent more features, we need to add more dimensions.== The main bottleneck here is orthogonality between features. In a d-dimensional orthogonal space, you can have at most d orthogonal vectors. However, if we relax this orthogonality constraint, in a d-dimensional space, we can fit exponentially many nearly orthogonal vectors (<a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">see related lemma here</a>). This is how neural networks are able to represent more features than dimensions.</p>
+<p>However, because we no longer have complete orthogonality, these vectors now interfere with each other ==(sketch a diagram and explain this further).==</p>
+<p>The model’s ability to represent more features than dimensions is called superposition.</p>
+<p>For superposition to be useful, there’s a key assumption that we make (that seems to be well supported): Sparsity.</p>
+</section>
+<section id="sparsity" class="level2">
+<h2 class="anchored" data-anchor-id="sparsity">==Sparsity==</h2>
+<p>Sparsity is exactly what it sounds like - out of all the possible set of features (potentially very large), only a few of them activate for a given input. Think about it, if you have an image of a penguin eating fish, there’s no reason you’d want the neural network to activate features related to an airplane (ofc there’s nuance in this example, but the point still stands - most natural inputs don’t activate close to as many features as the model can represent). This is cool and all, but why do we actually need sparsity to be true for superposition to be useful?</p>
+<p>==To answer this, let’s consider what happens when we’re working in a dense regime (we assume many features activate at the same time). Notice in the previous section that we described interference. Now, if we’re in a dense regime, the interference is naturally higher, since there are more active vectors and therefore more projections. As a result, faithful reconstruction becomes harder because we’re corrupting the signal with some non-trivial (and potentially strong) amount of noise.==</p>
+<p>However, in a sparse regime, only a few features activate for any given input, so the effect of interference is minimal, helping us pick up the signal from the noise.</p>
+<p>You might be wondering, is this constraint limiting? This constraint isn’t arbitrary; it reflects the structure of real-world data. We design the loss function to enforce sparsity precisely because natural inputs are themselves sparse, as we saw in the penguin example (more on the loss function later). The model isn’t being forced into an artificial regime. (==See also: the Manifold Hypothesis, which provides geometric justification for why this sparsity is natural==)</p>
+<p>==The way features align across these different regimes is very interesting (link to the anthropic paper). Interestingly, as we move into a dense regime, the features become similar to PCA.==</p>
+</section>
+<section id="polysemanticity" class="level2">
+<h2 class="anchored" data-anchor-id="polysemanticity">Polysemanticity</h2>
+<p>A neuron is said to be polysemantic if it activates for multiple unrelated inputs. In other words, if the activation value of a neuron is non trivial for unrelated inputs, say penguins, and venture capitalists, then the neuron is said to be polysemantic.</p>
+<p>If you’re wondering what the difference between polysemanticity and superposition is, polysemanticity is a defined as a property of a neuron, whereas superposition is the ability of the model to represent more features than dimensions. Features are arbitrary directions in activation space, and neurons are basis aligned (what this means is the output of a particular neuron is along a basis in <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BR%7D%5Ed"> if we have d neurons).</p>
+</section>
+<section id="monosemanticity" class="level2">
+<h2 class="anchored" data-anchor-id="monosemanticity">Monosemanticity</h2>
+<p>Monosemanticity is the opposite of polysemanticity; or more simply put if a neuron consistently activates for related inputs (say for example, penguins, birds, fish) then they’re said to be monosemantic.</p>
+</section>
+<section id="privileged-vs-non-privileged-basis" class="level2">
+<h2 class="anchored" data-anchor-id="privileged-vs-non-privileged-basis">Privileged vs Non-Privileged Basis</h2>
+<p><strong>Privileged basis</strong> means that there is an incentive for feature directions to align with the basis direction. What does this mean?</p>
+<p>Say we have a neural network, with <img src="https://latex.codecogs.com/png.latex?d"> hidden neurons. As a consequence, the activation space for the hidden layer is <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BR%7D%5Ed">, and the canonical basis is represented by <img src="https://latex.codecogs.com/png.latex?(e_1,%20e_2,%20%5Cldots,%20e_d)">.</p>
+<p>When we say a feature <img src="https://latex.codecogs.com/png.latex?f_i"> aligns with a basis direction, we mean all entries other than the index <img src="https://latex.codecogs.com/png.latex?i"> are zero. In other words, <img src="https://latex.codecogs.com/png.latex?f_i%20=%20(0,%20%5Cldots,%201,%200,%5Cldots,0)"> (1 at index i). So our activation vector, in this case, is represented by <img src="https://latex.codecogs.com/png.latex?a%20=%20k_if_i">, so the activation vector is just scaling a basis direction. This is a special case, when only feature <img src="https://latex.codecogs.com/png.latex?i"> (<img src="https://latex.codecogs.com/png.latex?f_i)"> is present, but we can extend this idea more generally when multiple features are present at the same time: <img src="https://latex.codecogs.com/png.latex?%0Aa%20=%20%5Csum_%7Bi=1%7D%5E%7Bd%7Dk_if_i%20=%20(k_1,%20k_2,%20%5Cldots,%20k_d)%0A"> This is actually a very neat representation, since we’re able to represent multiple features (or have multiple features be active at the same time) without the cost of interference since our basis is orthogonal.</p>
+<p>If you’re wondering how <img src="https://latex.codecogs.com/png.latex?k_i"> is determined, recall that <img src="https://latex.codecogs.com/png.latex?Wx+b%20%5Cin%20%5Cmathbb%7BR%7D%5Ed">. We then pass this vector into ReLU, and each index of this post-ReLU vector gives the value for <img src="https://latex.codecogs.com/png.latex?k_i">.</p>
+<p>==Note, that just because there is incentive for a model to align features with the basis directions, doesn’t necessarily mean it happens. There could be other (potentially stronger) forces that override how features get represented.== In fact, many times, when the model wants to represent more features than dimensions (aka be in superposition), it aligns away from the privileged basis.</p>
+<p>Some examples of a privileged basis are activation spaces of convolutional neural networks, multi layer perceptrons (MLP) etc.</p>
+<p>The mechanics of how (and why) privileged basis form are out of the scope of this blog (it relates to how ReLU folds the activation space).</p>
+<p><strong>Non Privileged Basis</strong> means that there is no reason to believe that basis dimensions are special, and that features can be thought of as arbitrary dimensions in space.</p>
+<p>Examples of non privileged basis include word embedding models, transformer residual stream, etc.</p>
+</section>
+<section id="features" class="level2">
+<h2 class="anchored" data-anchor-id="features">Features</h2>
+<p>This is a repeat of the point mentioned earlier, but I think it’s worth emphasizing again. I should note that the field is still debating what a feature is, and, as of now, from my understanding, it doesn’t have a very neat, concrete definition.</p>
+</section>
+</section>
+<section id="sparse-auto-encoders-sae-as-a-tool-for-monosemanticity" class="level1">
+<h1>Sparse Auto Encoders (SAE) as a tool for Monosemanticity</h1>
+<p>Now that we’ve covered a bunch of terminology, we’re ready to go into the main tool, that helps us understand these models better (at least to some degree). Recall that the residual stream of a transformer is in a non privileged basis, and is polysemantic in nature. This makes it difficult to peak into the models activations and understand whats going on. Is there a way we can take this representation and convert it into a somewhat monosemantic representation with a privileged basis?</p>
+<p>That’s what Sparse Auto Encoders aim to do. They aim to represent this activation vector in an overcomplete basis (overcomplete relative to the activation vector dimension size). This way the model has more freedom to choose a better representation.</p>
+<p>Also, a related hypothesis states that the model lacks enough dimensions to represent all the features that it wants to, and is in some sense noisily simulating a larger model (I should note, that to the best of my knowledge, this is remains a hypothesis). A Sparse Auto Encoder has two parts, namely an encoder and a decoder. The encoder takes our activation vector (<img src="https://latex.codecogs.com/png.latex?x">) and represents it in a higher dimension. The decoder takes this encoded representation, and maps it back to the activation space.</p>
+<p>Some terminology that will help us out here: - Residual Stream : Output of a given layer in a transformer (<img src="https://latex.codecogs.com/png.latex?x">) - Activation Space: This is where the residual stream lives - Encoded Vector: This is what we get after we pass through the residual stream through the SAE’s encoder layer (<img src="https://latex.codecogs.com/png.latex?h">) - Hidden Space: This is the space where the encoded vector lives. - Decoded Vector: This is what we get, in the activation space, after we pass in the encoded vector through the decoder layer of the SAE (<img src="https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D">).</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0Ah%20=%20ReLU(W_%7Benc%7D(x-b_%7Bdec%7D)%20+%20b_%7Benc%7D)%0A"> <img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7Bx%7D%20=%20W_%7Bdec%7Dh%20+%20b_%7Bdec%7D%0A"> The overcomplete basis, helps us get a more monosemantic representation and the ReLU activation function, encourages a privileged basis which makes it more interpretable, since we can now look at each neuron and ask “what does this do?”</p>
+<section id="notes" class="level3">
+<h3 class="anchored" data-anchor-id="notes">Notes</h3>
+<ol type="1">
+<li>==Why are we subtracting the decoder bias from the encoder? By doing <strong>x - b_dec</strong>, you strip away that baseline first. Now the encoder sees something centered around zero — just the variation that differs across inputs. That’s where the actual features live.==</li>
+<li>We normalize the decoder weights - talk about why we do this.</li>
+</ol>
+</section>
+<section id="loss" class="level2">
+<h2 class="anchored" data-anchor-id="loss">Loss</h2>
+<section id="loss-breakdown" class="level3">
+<h3 class="anchored" data-anchor-id="loss-breakdown">Loss Breakdown</h3>
+<p>The loss function we use in this experiment is <img src="https://latex.codecogs.com/png.latex?%0Aloss%20=%20MSE(x,%5Chat%7Bx%7D)%20+%20%5Clambda%20F_1(h,%20torch.zeros)%0A"></p>
+<p>The first term of the loss function gives us a sense of our reconstruction fidelity, and the second term enforces sparsity. The first term is fairly straightforward, so I won’t go into too much detail here, but the second term is worth examining more closely (too see why we care about reconstruction fidelity see the section below)</p>
+<p>Basically, in the second term, we’re computing the F1 loss between our encoded representation and the 0 vector of the same dimensions. This tells us what dimensions get activated (and it gives us the sum). The sparsity parameter (lambda) tells us how much to penalize this term, so a smaller lambda allows more dimensions to get activated.</p>
+</section>
+<section id="why-this-specific-loss-function" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-specific-loss-function">Why this specific loss function?</h3>
+<p>There could be other loss functions that we design, but this one is fairly intuitive given that we need a loss function that can balance both reconstruction fidelity and sparsity.</p>
+<p>Now you might be wondering, why do we bother with the reconstruction quality at all in the first place? Well, we need a way to verify that the encoded representation is faithful to the actual activation vector, and that the model isn’t creating arbitrary representations. Since the reconstruction fidelity is directly impacted by the encoded representation (since <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D%20=%20W_%7Bdec%7Dh%20+%20b_%7Bdec%7D"> ), measuring the reconstruction fidelity is a good way to know that the model stays truthful to its original representation.</p>
+</section>
+</section>
+<section id="dead-neurons" class="level2">
+<h2 class="anchored" data-anchor-id="dead-neurons">Dead Neurons</h2>
+<section id="what-are-dead-neurons" class="level3">
+<h3 class="anchored" data-anchor-id="what-are-dead-neurons">What are dead neurons?</h3>
+<p>We use a Sparse Auto Encoder to give the model the ability to represent data with more space - I like to think about this as the model stretching its legs. Something that may have been a compressed representation (i.e., not a clean, human-readable feature) in a lower dimension can become more mono-semantic, with one dimension representing a human-interpretable feature. During training, an interesting observation is that many dimensions are dead (i.e., they don’t activate for any input). Based on my training runs, here’s a table that highlights the proportion of dead neurons for a given expansion and sparsity factor (lambda).</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Lambda/Expansion Factor</th>
+<th>4x</th>
+<th>8x</th>
+<th>16x</th>
+<th>32x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1e-2</td>
+<td>TBD</td>
+<td>TBD</td>
+<td>TBD</td>
+<td>TBD</td>
+</tr>
+<tr class="even">
+<td>1e-4</td>
+<td>TBD</td>
+<td>TBD</td>
+<td>TBD</td>
+<td>TBD</td>
+</tr>
+</tbody>
+</table>
+<p>Note: In the experiment that I ran, a feature is considered to be dead if all activation values for that feature are below 0.07. This was chosen arbitrarily, different thresholds would potentially lead to results, but since this number is a small threshold, it should capture the general trend pretty well.</p>
+<p>This is interesting. Even though the model has more space to represent data, it only uses a fraction of it? A natural next question is - Why does this happen?</p>
+</section>
+<section id="why-do-dead-neurons-occur" class="level3">
+<h3 class="anchored" data-anchor-id="why-do-dead-neurons-occur">Why do dead neurons occur?</h3>
+<p>My initial thought here was to see what would happen if we simply relaxed lambda a little bit. I thought 1e-2 might be enforcing sparsity too strongly. So I changed it to 1e-4, but, it didn’t lead to much improvement in the proportion of dead neurons. To understand what’s happening here, we need to revisit the encoding equation. <img src="https://latex.codecogs.com/png.latex?%0Ah%20=%20ReLU(W_%7Benc%7D(x-b_%7Bdec%7D)%20+%20b_%7Benc%7D)%0A"> where <img src="https://latex.codecogs.com/png.latex?h"> is our encoded vector in and <img src="https://latex.codecogs.com/png.latex?x"> is the residual stream activation vector.</p>
+<p>During training, we feed in both the features (<img src="https://latex.codecogs.com/png.latex?h">) and results (<img src="https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D">) into the loss function. See loss section for more details, but as a recap, our loss function is: <img src="https://latex.codecogs.com/png.latex?%0Aloss%20=%20MSE(x,%5Chat%7Bx%7D)%20+%20%5Clambda%20F_1(h,%20torch.zeros)%0A"> Or for ease of representation, we drop the vector format for now, and zoom in on individual elements <img src="https://latex.codecogs.com/png.latex?loss%20=%20%5Cfrac%7B1%7D%7Bd%7D%5Csum_%7Bi=1%7D%5E%7Bd%7D(x_i%20-%20%5Chat%7Bx%7D_i)%5E2%20+%20%5Clambda%5Csum_%7Bj=1%7D%5E%7Bm%7D%20ReLU%5Cleft(%5Csum_%7Bk=1%7D%5E%7Bd%7D%20W_%7Benc_%7Bjk%7D%7D(x_k%20-%20b_%7Bdec_k%7D)%20+%20b_%7Benc_j%7D%20-%200%5Cright)"></p>
+<p>Notice that the first term of the loss, doesn’t actually care about the sparsity, and since we’re concerned with dead neurons in the SAE hidden layer (encoded layer), we’re only interested in the second term of the loss function. ==(I should note that “doesn’t care about sparsity” is an oversimplification, it does indirectly care, and it pushes against dead neurons, since if a neuron dies, the reconstruction quality could suffer, a more accurate statement is that the MSE term doesn’t actively penalize the sparsity directly)==</p>
+<p>Now, something interesting happens when we take the derivative of the loss function with respect to encoder weights. Because there’s a ReLU function, if the term inside the ReLU is negative, then ReLU clamps it to 0, and the derivative also ends up being zero, so no signal propagates further and that dimension is marked as dead. For example sake, lets see what happens when we consider an arbitrary dimension 2345</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0Az_%7B2345%7D%20=%20%5Cleft(%5Csum_%7Bk=1%7D%5E%7Bd%7D%20W_%7Benc_%7B2345,k%7D%7D(x_k%20-%20b_%7Bdec%7D)%20+%20b_%7Benc_%7B2345%7D%7D%20-%200%5Cright)%0A"> and <img src="https://latex.codecogs.com/png.latex?%0Af_%7B2345%7D%20=%20ReLU(z_%7B2345%7D)%0A"> If <img src="https://latex.codecogs.com/png.latex?z%20%3C%200"> then <img src="https://latex.codecogs.com/png.latex?f_%7B2345%7D%20=%200"> and the gradient <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20f_%7B2345%7D%7D%7B%5Cpartial%20z_%7B2345%7D%7D%20=%200"></p>
+<p>So when we take the gradient of the loss term, the backward pass gives us $$ =</p>
+<p>.</p>
+<p>.</p>
+<p>$$</p>
+<p>Since the middle term <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20f_%7B2345%7D%7D%7B%5Cpartial%20z_%7B2345%7D%7D%20=%200">, the entire gradient gets set to zero. Now, if there is no gradient signal in that direction for all inputs, then that dimension is always zero for all encoded vectors <img src="https://latex.codecogs.com/png.latex?h">.</p>
+<p>Also note that in the reconstruction, we multiply <img src="https://latex.codecogs.com/png.latex?W_%7Bdec%7D"> with <img src="https://latex.codecogs.com/png.latex?h">, so if a dimension is always 0 in the encoded space, it contributes nothing to the reconstruction either.</p>
+<p><strong>Summary</strong> 1. <strong>Sparsity term:</strong> <img src="https://latex.codecogs.com/png.latex?%5Clambda%20%5Ccdot%20f_%7B2345%7D%20=%20%5Clambda%20%5Ccdot%200%20=%200"> — contributes nothing 2. <strong>Reconstruction:</strong> <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bx%7D_i%20=%20%5Csum_j%20W_%7Bdec_%7Bij%7D%7D%20f_j%20+%20b_%7Bdec_i%7D"> — the <img src="https://latex.codecogs.com/png.latex?j=2345"> column of <img src="https://latex.codecogs.com/png.latex?W_%7Bdec%7D"> gets multiplied by 0, so <strong>this feature contributes nothing to the reconstruction either</strong></p>
+</section>
+<section id="fix-to-the-dead-neuron-problem" class="level3">
+<h3 class="anchored" data-anchor-id="fix-to-the-dead-neuron-problem">Fix to the dead neuron problem</h3>
+<p>At some given checkpoint, we do the following: (Note that when we’re talking about neurons here, we’re referring to the neurons of the SAE, so when we refer to inputs, we’re referring to the activation vector of GPT-2 residual stream) 1. At some checkpoint, figure out which neuron directions have not fired at all. 2. Take a random sample of data points and compute the loss. 3. Assign each data point a sampling probability that is proportional to its contribution to the loss (this is because if there are certain points the model is struggling to represent, we should try and promote those). 4. Take the normalized input (activation vector), drawn from this sampling distribution and set of the dead neurons to this vector. 5. We do the same thing for the decoder neurons as well.</p>
+<pre><code>W_enc[:, dead_neuron] = normalized_vector
+W_dec[dead_neuron, :] = normalized_vector</code></pre>
+<ol start="6" type="1">
+<li>We then reset the bias, to a small negative value.</li>
+<li>Reset Adam optimizer state.</li>
+</ol>
+<p>=={Fill in on why we chose to do sampling this way - what are the key decisions.== 1. ==Why do we normalize activation vector?== 2. ==Why do we reset the bias?}==</p>
+</section>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+</section>
+<section id="critiques-of-sparse-auto-encoders" class="level1">
+<h1>Critiques of Sparse Auto Encoders</h1>
+</section>
+<section id="notes-1" class="level1">
+<h1>Notes</h1>
+<p>Please note that this post was written by me and proofread by an AI (Claude). Since I haven’t had another pair of (human) eyes read this, the post is prone to errors - if you happen to find errors, please notify me at {email id}</p>
+</section>
+<section id="feedback" class="level1">
+<h1>Feedback</h1>
+<p>Feedback is always welcome! If you have any comments on things that could have been done differently, or areas where my explanation was lacking, please feel free to contact me. # Errata - To be updated on the fly.</p>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>We analyze the residual stream of layer 6, of GPT-2. The model used can be found ==here==. We pass data from the Open Web Text through GPT-2, and get the residual stream of layer 6.</p>
+<section id="experiment-details" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-details">Experiment Details</h3>
+<ul>
+<li>GPT-2 Residual Stream: 768</li>
+<li>GPT-2 Layer : 6 (halfway point of GPT-2, since the model has 12 layers)</li>
+<li>SAE Expansion Factors: 4,8,16,32x (relative to the residual stream dimension)</li>
+<li>Activation Function: ReLU</li>
+<li>Optimizer: Adam</li>
+<li>Sparsity Parameters: <img src="https://latex.codecogs.com/png.latex?1e-2">, <img src="https://latex.codecogs.com/png.latex?1e-4"></li>
+<li>Dead Neuron Sampling Frequency: 25000</li>
+<li>Training Hardware: 1x Nvidia A100 GPU (via RunPod, on demand)</li>
+</ul>
+<p>For more details on training, or activation extractions, the code is available in the GitHub repo.</p>
+</section>
+</section>
+<section id="github-repo" class="level2">
+<h2 class="anchored" data-anchor-id="github-repo">Github Repo</h2>
+<p>Code for this repository can be found <a href="https://github.com/adityaiyer7/sae-monosemantic">here</a>. Note, at the moment of writing this, the repository is still a work in progress.</p>
+</section>
+<section id="weights" class="level2">
+<h2 class="anchored" data-anchor-id="weights">Weights</h2>
+<p>All weights are stored in a common HF bucket <a href="https://huggingface.co/buckets/thedarkknight7/sae-for-monosemanticity-model-weights">here</a>. The naming convention is</p>
+<pre><code>model_weights_{expansion_factor}x_{lambda}_{sampling_strategy}.pth</code></pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 38%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Lambda/Expansion Factor</th>
+<th>4x</th>
+<th>8x</th>
+<th>16x</th>
+<th>32x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1e-2</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+</tr>
+<tr class="even">
+<td>1e-4</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+<td>WandB Run</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="feature-extraction-no-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="feature-extraction-no-sampling">Feature Extraction (No Sampling)</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Lambda/Expansion Factor</th>
+<th>4x</th>
+<th>8x</th>
+<th>16x</th>
+<th>32x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1e-2</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.01">HF Repo</a><br>WandB Run</td>
+</tr>
+<tr class="even">
+<td>1e-4</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.0001">HF Repo</a><br>WandB Run</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="feature-extraction-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="feature-extraction-sampling">Feature Extraction (Sampling)</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Lambda/Expansion Factor</th>
+<th>4x</th>
+<th>8x</th>
+<th>16x</th>
+<th>32x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1e-2</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.01">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.01">HF Repo</a><br>WandB Run</td>
+</tr>
+<tr class="even">
+<td>1e-4</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.0001">HF Repo</a><br>WandB Run</td>
+<td><a href="https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.0001">HF Repo</a><br>WandB Run</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="sources" class="level1">
+<h1>Sources</h1>
+
+
+
+</section>
+
+<script data-goatcounter="https://YOUR_CODE.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script> ]]></description>
+  <category>Interpretability</category>
+  <guid>https://adityaiyer7.github.io/blogs/posts/sae-for-monosemanticity/</guid>
+  <pubDate>Sun, 29 Mar 2026 07:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>
