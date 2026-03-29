@@ -3,12 +3,15 @@
 # navigate to the directory where this script resides, so we always work relative to blogs/
 cd "$(dirname "$0")"
 
-# Check if a post name (slug) is provided
+# Check if a post title is provided
 if [ -z "$1" ]; then
-    read -p "Enter the blog post slug (e.g. new-model-eval): " POST_SLUG
+    read -p "Enter the blog post title (e.g. New Model Eval): " POST_TITLE
 else
-    POST_SLUG="$1"
+    POST_TITLE="$1"
 fi
+
+# Convert to a URL-friendly slug
+POST_SLUG=$(echo "$POST_TITLE" | tr '[:upper:]' '[:lower:]' | tr -s ' ' '-' | tr -cd 'a-z0-9_-')
 
 if [ -z "$POST_SLUG" ]; then
     echo "Post slug cannot be empty. Exiting."
@@ -56,7 +59,7 @@ CURRENT_DATE=$(date +%Y-%m-%d)
 
 cat > "$TARGET_DIR/index.qmd" <<EOF
 ---
-title: "$POST_SLUG"
+title: "$POST_TITLE"
 description: "Brief description of the post."
 date: $CURRENT_DATE
 categories: [$SELECTED_CAT]
