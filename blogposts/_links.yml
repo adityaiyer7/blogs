@@ -1,0 +1,10 @@
+website:
+  navbar:
+    left:
+      - text: "Home"
+        href: "https://iambatman.live/"
+      - text: "Blogs"
+        href: "/"
+    right:
+      - icon: "github"
+        href: "https://github.com/adityaiyer7"

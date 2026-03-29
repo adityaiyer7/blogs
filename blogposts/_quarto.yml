@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: docs
+
+metadata-files:
+  - _links.yml
+
+website:
+  description: "Notes on mechanistic interpretability and machine learning."
+  site-url: https://adityaiyer7.github.io/blogs
+  body-footer: |
+    <script data-goatcounter="https://YOUR_CODE.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    mainfont: "Lora"
+    highlight-style: github
+    code-fold: true
+    code-tools: false
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: false
+    df-print: paged
+    fig-align: center
+    math: mathjax
+    grid:
+      body-width: 850px
+      margin-width: 300px
