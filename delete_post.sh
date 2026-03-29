@@ -14,6 +14,11 @@ if [ -z "$POST_SLUG" ]; then
     exit 1
 fi
 
+if [[ ! "$POST_SLUG" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    echo "Error: Invalid post slug. Only alphanumeric characters, dashes, and underscores are allowed."
+    exit 1
+fi
+
 POST_DIR="blogposts/posts/$POST_SLUG"
 DOCS_DIR="blogposts/docs/posts/$POST_SLUG"
 
