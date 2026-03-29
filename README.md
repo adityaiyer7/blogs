@@ -1,6 +1,3 @@
-# Topics
-[1. LLM Work Flows](https://github.com/adityaiyer7/blogs/tree/master/llm_work_flows)
-
 ## Authoring Blog Posts
 
 This repository contains a simplified directory structure for generating blog content using Quarto under `blogposts/`.
