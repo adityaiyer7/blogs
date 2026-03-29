@@ -1,0 +1,268 @@
+/*
+ * Quarto Blog Theme — Academic/Minimal
+ * Inspired by jamiesimon.io
+ * Drop this file next to _quarto.yml
+ */
+
+/* ── Fonts ──────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500&display=swap');
+
+/* ── Variables ──────────────────────────────────────────────── */
+:root {
+  --body-font:    'Lora', Georgia, serif;
+  --ui-font:      'Inter', sans-serif;
+  --code-font:    'Source Code Pro', monospace;
+
+  --text-primary:   #1a1a1a;
+  --text-secondary: #555;
+  --text-muted:     #888;
+  --accent:         #2a5db0;      /* a calm academic blue */
+  --bg:             #FCF8F2;      /* slightly warm white */
+  --border:         #e8e8e4;
+
+  --content-width: 100%; /* let Quarto's grid control width */
+  --side-pad: 1.5rem;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+body {
+  font-family:      var(--body-font);
+  font-size:        1.05rem;
+  line-height:      1.8;
+  color:            var(--text-primary);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout: constrain content width ───────────────────────── */
+.quarto-container,
+#quarto-content,
+.page-columns .column-body {
+  max-width: var(--content-width) !important;
+  margin: 0 auto;
+  padding: 0 var(--side-pad);
+}
+
+/* full-width for listing pages (post grid) */
+.quarto-listing {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+.navbar {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem var(--side-pad);
+}
+
+.navbar-brand {
+  font-family: var(--ui-font);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.01em;
+}
+
+.navbar-nav .nav-link {
+  font-family: var(--ui-font);
+  font-size: 0.875rem;
+  color: var(--text-secondary) !important;
+  transition: color 0.15s;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--text-primary) !important;
+}
+
+/* ── Post header ─────────────────────────────────────────────── */
+.quarto-title h1.title {
+  font-family: var(--body-font);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.quarto-title .description {
+  font-family: var(--ui-font);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  font-style: normal;
+}
+
+.quarto-title-meta {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+/* ── Body text ───────────────────────────────────────────────── */
+p {
+  margin-bottom: 1.3rem;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--body-font);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+h2 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1rem; color: var(--text-secondary); }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* ── Math ────────────────────────────────────────────────────── */
+/* Give display math room to breathe */
+.math.display {
+  overflow-x: auto;
+  margin: 2rem 0;
+  padding: 0.5rem 0;
+}
+
+/* ── Code ────────────────────────────────────────────────────── */
+pre {
+  font-family: var(--code-font);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: #f4f4f1;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+code {
+  font-family: var(--code-font);
+  font-size: 0.85em;
+  background: #f0f0ec;
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* code-fold button */
+.code-fold-btn-row button {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Figures & images ────────────────────────────────────────── */
+figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+figure img {
+  max-width: 100%;
+  border-radius: 3px;
+}
+
+figcaption {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ── Blockquote ──────────────────────────────────────────────── */
+blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Table of Contents ───────────────────────────────────────── */
+#TOC {
+  font-family: var(--ui-font);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+#TOC a {
+  color: var(--text-secondary);
+  border-bottom: none;
+}
+
+#TOC a:hover {
+  color: var(--accent);
+}
+
+/* ── Listing page (index) ────────────────────────────────────── */
+.quarto-listing-default .quarto-post {
+  border-bottom: 1px solid var(--border);
+  padding: 1.5rem 0;
+}
+
+.quarto-listing-default .quarto-post .thumbnail {
+  display: none; /* clean text-only listing */
+}
+
+.quarto-listing-default .listing-title a {
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: none;
+}
+
+.quarto-listing-default .listing-title a:hover {
+  color: var(--accent);
+}
+
+.quarto-listing-default .listing-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.quarto-listing-default .listing-date {
+  font-family: var(--ui-font);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.nav-footer {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root { --content-width: 100%; }
+  body  { font-size: 1rem; }
+  .quarto-title h1.title { font-size: 1.6rem; }
+}

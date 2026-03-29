@@ -1,0 +1,11 @@
+[project]
+name = "blogs"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "nbclient>=0.10.4",
+    "nbformat>=5.10.4",
+    "numpy>=2.4.3",
+    "pyyaml>=6.0.3",
+]
