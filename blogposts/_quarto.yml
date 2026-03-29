@@ -7,7 +7,7 @@ metadata-files:
 
 website:
   description: "Notes on mechanistic interpretability and machine learning."
-  site-url: https://your-username.github.io/blogposts
+  site-url: https://adityaiyer7.github.io/blogs
   body-footer: |
     <script data-goatcounter="https://YOUR_CODE.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
