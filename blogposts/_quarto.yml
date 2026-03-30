@@ -20,7 +20,7 @@ website:
       theme: preferred_color_scheme
       language: en
   body-footer: |
-    <script data-goatcounter="https://YOUR_CODE.goatcounter.com/count"
+    <script data-goatcounter="https://adityaiyer7.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
 
 format:
