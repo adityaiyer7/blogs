@@ -8,6 +8,17 @@ metadata-files:
 website:
   description: "Notes on mechanistic interpretability and machine learning."
   site-url: https://adityaiyer7.github.io/blogs
+  comments:
+    giscus:
+      repo: adityaiyer7/blogs
+      repo-id: R_kgDOPEENLQ
+      category: "Blog Comments"
+      category-id: DIC_kwDOPEENLc4C5l2J
+      mapping: pathname
+      reactions-enabled: true
+      input-position: bottom
+      theme: preferred_color_scheme
+      language: en
   body-footer: |
     <script data-goatcounter="https://YOUR_CODE.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
