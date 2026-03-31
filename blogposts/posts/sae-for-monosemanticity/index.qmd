@@ -307,36 +307,30 @@ Note: There is potential to improve the labelling mechanism, by using better pro
 
 
 ### Monosemantic Feature Example
-This example corresponds to an expansion factor of 8x, sparsity penalty of $1e-4$ and with dead neuron sampling. 
+This example corresponds to an expansion factor of 8x, sparsity penalty of $1e-4$ and with dead neuron sampling.
 
 We see here that the dimension corresponds to **Washington**, which is a fairly concrete concept.
 
-::: {layout-ncol=3}
 ![](assets/imgs/monosemanticity_one.png)
 
 ![](assets/imgs/monosemanticity_two.png)
 
 ![](assets/imgs/monosemanticity_three.png)
-:::
 
 On the other hand, when we see this feature corresponds to something a little more abstract: **Tokens attached to preceding tokens without space.**
 
-::: {layout-ncol=2}
 ![](assets/imgs/monosemanticity_four.png)
 
 ![](assets/imgs/monosemanticity_five.png)
-:::
 
 
 ### Polysemantic Feature Example
 
-If we look at feature 1521, of expansion factor 4x, sparsity penalty of $1e-4$ with dead neuron sampling, we see that it's polysemantic. It activates for many random tokens, including Human, Earth, Disney, etc., which have no apparent theme. 
+If we look at feature 1521, of expansion factor 4x, sparsity penalty of $1e-4$ with dead neuron sampling, we see that it's polysemantic. It activates for many random tokens, including Human, Earth, Disney, etc., which have no apparent theme.
 
-::: {layout-ncol=2}
 ![](assets/imgs/polysemanticity_one.png)
 
 ![](assets/imgs/polysemanticity_two.png)
-:::
 
 ### Observations
 ![](assets/imgs/heatmap.png)

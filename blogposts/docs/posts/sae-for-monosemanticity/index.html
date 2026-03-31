@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.29">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-4928aee9384e66cb359dd8efc1d1e04a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-6fdef3033dd092da811a39d449ee8941.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -585,44 +585,18 @@ W_dec[dead_neuron, :] = normalized_vector</code></pre>
 <h3 class="anchored" data-anchor-id="monosemantic-feature-example">Monosemantic Feature Example</h3>
 <p>This example corresponds to an expansion factor of 8x, sparsity penalty of <span class="math inline">\(1e-4\)</span> and with dead neuron sampling.</p>
 <p>We see here that the dimension corresponds to <strong>Washington</strong>, which is a fairly concrete concept.</p>
-<div class="quarto-layout-panel" data-layout-ncol="3">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <p><img src="assets/imgs/monosemanticity_one.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <p><img src="assets/imgs/monosemanticity_two.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <p><img src="assets/imgs/monosemanticity_three.png" class="img-fluid"></p>
-</div>
-</div>
-</div>
 <p>On the other hand, when we see this feature corresponds to something a little more abstract: <strong>Tokens attached to preceding tokens without space.</strong></p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="assets/imgs/monosemanticity_four.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="assets/imgs/monosemanticity_five.png" class="img-fluid"></p>
-</div>
-</div>
-</div>
 </section>
 <section id="polysemantic-feature-example" class="level3">
 <h3 class="anchored" data-anchor-id="polysemantic-feature-example">Polysemantic Feature Example</h3>
 <p>If we look at feature 1521, of expansion factor 4x, sparsity penalty of <span class="math inline">\(1e-4\)</span> with dead neuron sampling, we see that it’s polysemantic. It activates for many random tokens, including Human, Earth, Disney, etc., which have no apparent theme.</p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="assets/imgs/polysemanticity_one.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="assets/imgs/polysemanticity_two.png" class="img-fluid"></p>
-</div>
-</div>
-</div>
 </section>
 <section id="observations" class="level3">
 <h3 class="anchored" data-anchor-id="observations">Observations</h3>
