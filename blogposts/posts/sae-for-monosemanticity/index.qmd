@@ -42,6 +42,7 @@ Before we go into the specifics of Neural Network Interpretability, it's worth r
 If you would like a primer to neural networks, [here's](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) a great playlist.  
 
 The following sections heavily borrow from these two papers:
+
 1. [Toy Models of Superposition](https://transformer-circuits.pub/2022/toy_model/index.html)
 2. [Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.](https://transformer-circuits.pub/2023/monosemantic-features)
 
