@@ -590,7 +590,10 @@ W_dec[dead_neuron, :] = normalized_vector</code></pre>
 <h2 class="anchored" data-anchor-id="feature-analysis">Feature Analysis</h2>
 <p>To analyze the features, we rank the features by selectivity and set a minimum activation count to 10. Selectivity is defined as <span class="math inline">\(\frac{\text{mean\_activation}}{\log(\text{num\_activations} + 1)}\)</span> and minimum activation count ensures there are at least those many examples that cause that feature to fire. This is useful to remove features that rarely fire.</p>
 <p>Once we rank the features, we take the top 25 and bottom 25 features by selectivity and pass each feature and all its examples through an LLM and ask it to come up with a label for that feature based on the activating token and context. If there is no coherent theme the model labels it as ‘POLYSEMANTIC’.</p>
-<p>You can try out the interactive feature visualizer by running the setup commands mentioned in the README.MD file.</p>
+<p>You can explore features interactively using the visualizer below. <strong>Note: this is experimental and may be unreliable</strong> — results can be slow, incomplete, or inconsistent depending on the model/config selected.</p>
+<iframe src="https://thedarkknight7-sae-feature-explorer.hf.space" width="100%" height="700px" frameborder="0" style="border: 1px solid #ddd; border-radius: 6px;">
+</iframe>
+<p>Alternatively, you can run it locally by following the setup instructions in the README.MD file.</p>
 <p>Note: There is potential to improve the labelling mechanism, by using better prompts, and stricter guidelines so these results should be not be taken as absolute ground truth (in fact this is one of the weaknesses of SAE’s - see next section.)</p>
 <section id="monosemantic-feature-example" class="level3">
 <h3 class="anchored" data-anchor-id="monosemantic-feature-example">Monosemantic Feature Example</h3>
