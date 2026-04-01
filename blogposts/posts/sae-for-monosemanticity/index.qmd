@@ -80,6 +80,7 @@ You might be wondering, is this constraint limiting? This constraint isn't arbit
 The way features align across these different regimes is very interesting. As we move into a dense regime, the features become similar to PCA.
 ![Feature alignment](assets/imgs/feature_alignment.png)
 
+*Source: [Toy Models of Superposition](https://transformer-circuits.pub/2022/toy_model/index.html)*
 
 
 ## Polysemanticity
