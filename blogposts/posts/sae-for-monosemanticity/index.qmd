@@ -25,6 +25,7 @@ However, in this simplistic model, we fail to account for bias, so our line must
 $$y = w_1x_1 + w_2x_2 + w_3x_3 + w_4x_4 + w_5x_5 + w_6 \cdot 1$$
 
 Note that this now becomes a representation in 6 dimensions (the 6th dimension is just all 1's), or more canonically, we write
+
 $$\sum_{i=1}^{5} w_i x_i + b$$
 where $w_6 = b$.
 
@@ -229,9 +230,10 @@ $$
 Like before, the $\frac{\partial f_j}{\partial z_j} =0$ so the MSE term can't revive the neuron either.
 
 **Summary**
+
 1. **Sparsity term:** $\lambda \cdot f_{2345} = \lambda \cdot 0 = 0$ — contributes nothing
 2. **Reconstruction:** $\hat{x}_i = \sum_j W_{dec_{ij}} f_j + b_{dec_i}$ — the $j=2345$ column of $W_{dec}$ gets multiplied by 0, so **this feature contributes nothing to the reconstruction either**.
-3. MSE is not able to revive dead neurons. 
+3. MSE is not able to revive dead neurons.
 
 ### Fix to the dead neuron problem
 At some given checkpoint, we do the following:
@@ -252,6 +254,7 @@ W_dec[dead_neuron, :] = normalized_vector
 7. Reset Adam optimizer state.
 
 **Sampling Design Decisions**
+
 1. **Why do we normalize activation vector?** Essentially the same reason mentioned earlier. If we didn't normalize, it would bias the neuron to fire strongly across the board, not just for this particular input. 
 2. **Why do we reset the bias?** Making this a mild negative value, just acts like a mild prior toward sparsity. We notice some neurons don't fire, but we don't want our interference to be drastic or severe and we want the models to learn. We want the neurons to be alive only if the features align with it, and the negative bias acts as a gate in some sense, to make sure the feature is aligned with the neuron. 
 

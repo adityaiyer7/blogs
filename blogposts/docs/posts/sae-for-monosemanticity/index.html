@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.29">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-4928aee9384e66cb359dd8efc1d1e04a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-6fdef3033dd092da811a39d449ee8941.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -257,7 +257,8 @@ window.Quarto = {
 <p>In this representation, each <span class="math inline">\(w_i\)</span> tells us how much importance to give to each feature <span class="math inline">\(x_i\)</span>.</p>
 <p>However, in this simplistic model, we fail to account for bias, so our line must pass through the origin (this is restrictive, as you might imagine). To fix this, we add a bias term (all 1’s) so our hyperplane can move freely, leading to the result</p>
 <p><span class="math display">\[y = w_1x_1 + w_2x_2 + w_3x_3 + w_4x_4 + w_5x_5 + w_6 \cdot 1\]</span></p>
-<p>Note that this now becomes a representation in 6 dimensions (the 6th dimension is just all 1’s), or more canonically, we write <span class="math display">\[\sum_{i=1}^{5} w_i x_i + b\]</span> where <span class="math inline">\(w_6 = b\)</span>.</p>
+<p>Note that this now becomes a representation in 6 dimensions (the 6th dimension is just all 1’s), or more canonically, we write</p>
+<p><span class="math display">\[\sum_{i=1}^{5} w_i x_i + b\]</span> where <span class="math inline">\(w_6 = b\)</span>.</p>
 <p>This is a long winded way of saying that in linear models, we have the luxury of giving each feature its own dimension. This is possible to do because linear models get hand crafted features as input, but how do you hand craft features for things like images, audio, text etc? This is an incredibly difficult thing to do in practice! This is where more modern methods like Neural Networks come in. We’re able to pass in raw real world data (with some pre-processing of course) and have them work incredibly well! This is what makes them so versatile, but also so much harder (and interesting!) to study. This begs the question how the hell are they actually storing information?</p>
 </section>
 <section id="neural-network-basics" class="level3">
@@ -306,6 +307,7 @@ window.Quarto = {
 <p>However, in a sparse regime, only a few features activate for any given input, so the effect of interference is minimal, helping us pick up the signal from the noise.</p>
 <p>You might be wondering, is this constraint limiting? This constraint isn’t arbitrary; it reflects the structure of real-world data. We design the loss function to enforce sparsity precisely because natural inputs are themselves sparse, as we saw in the penguin example (more on the loss function later). The model isn’t being forced into an artificial regime.</p>
 <p>The way features align across these different regimes is very interesting. As we move into a dense regime, the features become similar to PCA. <img src="assets/imgs/feature_alignment.png" class="img-fluid" alt="Feature alignment"></p>
+<p><em>Source: <a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a></em></p>
 </section>
 <section id="polysemanticity" class="level2">
 <h2 class="anchored" data-anchor-id="polysemanticity">Polysemanticity</h2>
@@ -433,7 +435,12 @@ f_{2345} = ReLU(z_{2345})
 \frac{\partial f_j}{\partial z_j} \cdot
 \frac{\partial z_j}{\partial W_{enc_{j,k}}}
 \]</span> Like before, the <span class="math inline">\(\frac{\partial f_j}{\partial z_j} =0\)</span> so the MSE term can’t revive the neuron either.</p>
-<p><strong>Summary</strong> 1. <strong>Sparsity term:</strong> <span class="math inline">\(\lambda \cdot f_{2345} = \lambda \cdot 0 = 0\)</span> — contributes nothing 2. <strong>Reconstruction:</strong> <span class="math inline">\(\hat{x}_i = \sum_j W_{dec_{ij}} f_j + b_{dec_i}\)</span> — the <span class="math inline">\(j=2345\)</span> column of <span class="math inline">\(W_{dec}\)</span> gets multiplied by 0, so <strong>this feature contributes nothing to the reconstruction either</strong>. 3. MSE is not able to revive dead neurons.</p>
+<p><strong>Summary</strong></p>
+<ol type="1">
+<li><strong>Sparsity term:</strong> <span class="math inline">\(\lambda \cdot f_{2345} = \lambda \cdot 0 = 0\)</span> — contributes nothing</li>
+<li><strong>Reconstruction:</strong> <span class="math inline">\(\hat{x}_i = \sum_j W_{dec_{ij}} f_j + b_{dec_i}\)</span> — the <span class="math inline">\(j=2345\)</span> column of <span class="math inline">\(W_{dec}\)</span> gets multiplied by 0, so <strong>this feature contributes nothing to the reconstruction either</strong>.</li>
+<li>MSE is not able to revive dead neurons.</li>
+</ol>
 </section>
 <section id="fix-to-the-dead-neuron-problem" class="level3">
 <h3 class="anchored" data-anchor-id="fix-to-the-dead-neuron-problem">Fix to the dead neuron problem</h3>
@@ -449,7 +456,11 @@ f_{2345} = ReLU(z_{2345})
 <pre><code>W_enc[:, dead_neuron] = normalized_vector
 W_dec[dead_neuron, :] = normalized_vector</code></pre>
 <p>(Note: <code>W_enc</code> is stored as <code>[input_dim, hidden_dim]</code>, so hidden neurons correspond to columns. This is the transpose of the convention implied by the formula notation <span class="math inline">\(W_{enc}(x - b_{dec})\)</span>, but the computation is equivalent.) 6. We then reset the bias, to a small negative value. 7. Reset Adam optimizer state.</p>
-<p><strong>Sampling Design Decisions</strong> 1. <strong>Why do we normalize activation vector?</strong> Essentially the same reason mentioned earlier. If we didn’t normalize, it would bias the neuron to fire strongly across the board, not just for this particular input. 2. <strong>Why do we reset the bias?</strong> Making this a mild negative value, just acts like a mild prior toward sparsity. We notice some neurons don’t fire, but we don’t want our interference to be drastic or severe and we want the models to learn. We want the neurons to be alive only if the features align with it, and the negative bias acts as a gate in some sense, to make sure the feature is aligned with the neuron.</p>
+<p><strong>Sampling Design Decisions</strong></p>
+<ol type="1">
+<li><strong>Why do we normalize activation vector?</strong> Essentially the same reason mentioned earlier. If we didn’t normalize, it would bias the neuron to fire strongly across the board, not just for this particular input.</li>
+<li><strong>Why do we reset the bias?</strong> Making this a mild negative value, just acts like a mild prior toward sparsity. We notice some neurons don’t fire, but we don’t want our interference to be drastic or severe and we want the models to learn. We want the neurons to be alive only if the features align with it, and the negative bias acts as a gate in some sense, to make sure the feature is aligned with the neuron.</li>
+</ol>
 <p><strong>Dead Neuron Proportions With Sampling</strong></p>
 <table class="caption-top table">
 <thead>
