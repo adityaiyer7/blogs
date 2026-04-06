@@ -47,11 +47,47 @@ cd blogposts
 quarto preview
 ```
 
-When you are ready to publish and build all the raw HTML files for hosting:
-```bash
-cd blogposts
-quarto render
+Publishing is fully automated via GitHub Actions. You do **not** need to run `quarto render` before pushing — just push your source changes to `master` and CI will render and deploy to GitHub Pages automatically. The workflow triggers on any push that touches `blogposts/**`, `pyproject.toml`, `uv.lock`, or the workflow file itself.
+
+## Keeping Posts Private
+
+If you want to work on a post locally without it appearing on the live site or in the repository, add its folder to `.gitignore`:
+
 ```
+blogposts/posts/my-private-post/
+```
+
+The post will remain entirely local. When you are ready to publish, remove the entry from `.gitignore` and push to `master` as normal.
+
+## Exporting a Post as PDF
+
+To export a post as a PDF (e.g. to share privately before publishing), use the included export script from the root of the repository:
+
+```bash
+./export_pdf.sh my-post-slug
+```
+
+Or run it interactively without arguments and it will prompt you for the slug:
+
+```bash
+./export_pdf.sh
+```
+
+The script renders the post to HTML via Quarto and then uses Chrome in headless mode to print it to PDF. The output is saved alongside the source file at:
+
+```
+blogposts/posts/<post-slug>/<post-slug>.pdf
+```
+
+**Requirements:**
+
+- **Quarto** — must be installed and available on your `PATH`
+- **Google Chrome** — must be installed at the standard macOS path:
+  `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+
+The PDF will reflect the full site styling (theme, fonts, layout) since it is generated directly from the rendered HTML.
+
+> **Note:** Add `*.pdf` to your `.gitignore` if you do not want PDFs accidentally committed to the repository.
 
 <details>
 <summary>Repo Notes</summary>
