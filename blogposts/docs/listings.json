@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/attention-mechanism/index.html",
       "/posts/sae-for-monosemanticity/index.html"
     ]
   }

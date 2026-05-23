@@ -15,7 +15,7 @@ Or to automatically import an existing Markdown draft:
 **What the script does:**
 1. It creates a new folder for the post under `blogposts/posts/<post-slug>/`.
 2. It sets up an isolated assets folder `assets/imgs/`.
-3. If you provided a path to a draft `.md` file, it copies the `.md` file into the folder as `draft.md` (to preserve your original work) and automatically appends the contents into an `index.qmd` file with pre-filled YAML front matter.
+3. If you provided a path to a draft `.md` file, it copies the `.md` file into the folder as `_draft.md` (to preserve your original work), appends the contents into an `index.qmd` file with pre-filled YAML front matter, and normalizes the result for Quarto (inserts blank lines before `#` headings when missing—common after tables in Obsidian exports).
 4. If no `.md` draft is provided, it simply creates a starter `index.qmd` file with pre-filled front matter.
 
 Inside your newly generated `index.qmd`, you can include manually copied images using the relative path `![](assets/imgs/your-image.png)`.

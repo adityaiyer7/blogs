@@ -3,6 +3,25 @@
 # navigate to the directory where this script resides, so we always work relative to blogs/
 cd "$(dirname "$0")"
 
+# Pandoc/Quarto require a blank line before ATX headings (# .. ######). Obsidian and
+# other editors often omit that after tables or paragraphs, which breaks heading rendering.
+normalize_markdown_for_quarto() {
+    local file="$1"
+    awk '
+        BEGIN { in_fence = 0 }
+        /^```/ { in_fence = !in_fence; print; prev = $0; next }
+        {
+            if (!in_fence && $0 ~ /^#{1,6}[[:space:]]/) {
+                if (prev != "" && prev !~ /^[[:space:]]*$/) {
+                    print ""
+                }
+            }
+            print
+            prev = $0
+        }
+    ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+}
+
 # Check if a post title is provided
 if [ -z "$1" ]; then
     read -p "Enter the blog post title (e.g. New Model Eval): " POST_TITLE
@@ -75,9 +94,11 @@ if [ -n "$MD_DRAFT" ]; then
         cp "$MD_DRAFT" "$TARGET_DIR/_draft.md"
         # Append its contents to the index.qmd file
         cat "$MD_DRAFT" >> "$TARGET_DIR/index.qmd"
-        
+        normalize_markdown_for_quarto "$TARGET_DIR/index.qmd"
+
         echo "✅ Copied '$MD_DRAFT' to '$TARGET_DIR/_draft.md'"
         echo "✅ Appended draft content to '$TARGET_DIR/index.qmd'"
+        echo "✅ Normalized markdown for Quarto (blank lines before headings)"
     else
         echo "⚠️ Warning: Draft file '$MD_DRAFT' not found. Skipping file import."
         echo -e "# Introduction\n\nWrite your post content here...\n\nTo embed an image, use: \`![](assets/imgs/your-image.png)\`" >> "$TARGET_DIR/index.qmd"
