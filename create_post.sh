@@ -73,6 +73,21 @@ if [ -z "$SELECTED_CAT" ]; then
 fi
 echo ""
 
+echo "--- Post Types ---"
+echo "1) Full Research Project Post"
+echo "2) Mini Research Post"
+echo "3) Explanatory Post"
+echo "4) Misc Post"
+echo "------------------"
+read -p "Choose a post type [1-4] (default: 3): " POST_KIND_CHOICE
+case "$POST_KIND_CHOICE" in
+    1) POST_KIND="full-research" ;;
+    2) POST_KIND="mini-research" ;;
+    4) POST_KIND="misc" ;;
+    *) POST_KIND="explanatory" ;;
+esac
+echo ""
+
 # Create a template index.qmd
 CURRENT_DATE=$(date +%Y-%m-%d)
 
@@ -81,6 +96,7 @@ cat > "$TARGET_DIR/index.qmd" <<EOF
 title: "$POST_TITLE"
 description: "Brief description of the post."
 date: $CURRENT_DATE
+kind: $POST_KIND
 categories: [$SELECTED_CAT]
 toc: true
 ---

@@ -1,9 +1,13 @@
 project:
   type: website
   output-dir: docs
+  pre-render:
+    - python3 scripts/update_post_visibility.py
 
 metadata-files:
   - _links.yml
+  - _post_visibility.yml
+  - _hidden_posts.yml
 
 website:
   description: "Notes on mechanistic interpretability and machine learning."

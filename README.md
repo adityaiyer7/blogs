@@ -15,10 +15,27 @@ Or to automatically import an existing Markdown draft:
 **What the script does:**
 1. It creates a new folder for the post under `blogposts/posts/<post-slug>/`.
 2. It sets up an isolated assets folder `assets/imgs/`.
-3. If you provided a path to a draft `.md` file, it copies the `.md` file into the folder as `_draft.md` (to preserve your original work), appends the contents into an `index.qmd` file with pre-filled YAML front matter, and normalizes the result for Quarto (inserts blank lines before `#` headings when missing—common after tables in Obsidian exports).
-4. If no `.md` draft is provided, it simply creates a starter `index.qmd` file with pre-filled front matter.
+3. It prompts for a post type (`full-research`, `mini-research`, `explanatory`, or `misc`) that determines the post's homepage section, separately from topical categories such as `Interpretability`.
+4. If you provided a path to a draft `.md` file, it copies the `.md` file into the folder as `_draft.md` (to preserve your original work), appends the contents into an `index.qmd` file with pre-filled YAML front matter, and normalizes the result for Quarto (inserts blank lines before `#` headings when missing—common after tables in Obsidian exports).
+5. If no `.md` draft is provided, it simply creates a starter `index.qmd` file with pre-filled front matter.
 
 Inside your newly generated `index.qmd`, you can include manually copied images using the relative path `![](assets/imgs/your-image.png)`.
+
+### Showing and Hiding Post Sections
+
+Homepage sections have publish-time visibility switches in `blogposts/_post_visibility.yml`:
+
+```yaml
+post-kind-visibility:
+  full-research: true
+  mini-research: true
+  explanatory: true
+  misc: false
+```
+
+Set a post kind to `false` when you do not want that section or any of its posts published. During `quarto render` or deployment, disabled posts are marked as Quarto drafts through generated metadata in `blogposts/_hidden_posts.yml`, so they are omitted from homepage listings, search results, and the sitemap. The section heading is also omitted from the homepage, and a direct URL for a disabled post renders without its article content.
+
+`quarto preview` can still display draft pages when opened directly, as intended for reviewing unpublished work. The deployed site uses the hidden output from a normal render.
 
 ### Deleting Blog Posts
 
