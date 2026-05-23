@@ -1,14 +1,78 @@
 ---
 pagetitle: "Blogs"
+filters:
+  - filters/post_visibility.lua
 listing:
-  contents: posts
-  feed: true
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
+  - id: full-research
+    contents: posts
+    include:
+      kind: full-research
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+  - id: mini-research
+    contents: posts
+    include:
+      kind: mini-research
+    sort: "date desc"
+    type: default
+    sort-ui: false
+    filter-ui: false
+  - id: explanatory
+    contents: posts
+    include:
+      kind: explanatory
+    sort: "date desc"
+    type: default
+    sort-ui: false
+    filter-ui: false
+  - id: misc
+    contents: posts
+    include:
+      kind: misc
+    sort: "date desc"
+    type: default
+    sort-ui: false
+    filter-ui: false
 page-layout: full
 title-block-banner: false
 comments: false
 ---
+
+::: {.post-kind-section data-post-kind="full-research"}
+## Full Research Project Posts
+
+Completed research projects with their methods, experiments, and conclusions. Note: some work may be replications of existing papers.
+
+::: {#full-research}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="mini-research"}
+## Mini Research Posts
+
+Intermediate investigations and milestones within a broader research project.
+
+::: {#mini-research}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="explanatory"}
+## Explanatory Posts
+
+Conceptual walkthroughs, paper syntheses, and notes written to consolidate understanding.
+
+::: {#explanatory}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="misc"}
+## Misc Posts
+
+Philosophy, non-technical writing, and everything else.
+
+::: {#misc}
+:::
+:::

@@ -2,6 +2,7 @@
 title: "Sparse Autoencoders for Monosemanticity"
 description: "An exploration of Sparse Autoencoders as a tool for decomposing polysemantic neural network representations into interpretable, monosemantic features."
 date: 2026-03-30
+kind: full-research
 categories: [Interpretability]
 toc: true
 ---

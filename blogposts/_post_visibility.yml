@@ -1,0 +1,7 @@
+# Publish-time switches for each homepage post section.
+# Set a section to false to omit its posts from listings, search, and the sitemap.
+post-kind-visibility:
+  full-research: true
+  mini-research: false
+  explanatory: true
+  misc: false
