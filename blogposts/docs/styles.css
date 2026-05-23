@@ -199,6 +199,19 @@ blockquote {
   font-style: italic;
 }
 
+/* ── Tables ──────────────────────────────────────────────────── */
+#quarto-document-content table {
+  border: 1px solid var(--bs-table-border-color, var(--border));
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#quarto-document-content table > :last-child > tr:last-child > * {
+  border-bottom-width: 0;
+}
+
 /* ── Table of Contents ───────────────────────────────────────── */
 #TOC {
   font-family: var(--ui-font);
