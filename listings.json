@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/additivity-of-residual-stream/index.html",
       "/posts/hundred-day-retrospective/index.html",
       "/posts/attention-mechanism/index.html",
       "/posts/sae-for-monosemanticity/index.html"
