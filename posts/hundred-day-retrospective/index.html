@@ -252,7 +252,20 @@ window.Quarto = {
 
 </section>
 
-<script data-goatcounter="https://adityaiyer7.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script></main> <!-- /main -->
+<script>
+  window.goatcounter = {
+    path: function(p) {
+      return location.pathname.replace(/index\.html$/, '');
+    }
+  };
+  (function() {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = '//gc.zgo.at/count.js';
+    s.setAttribute('data-goatcounter', 'https://adityaiyer7.goatcounter.com/count');
+    document.body.appendChild(s);
+  })();
+</script></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
