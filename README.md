@@ -20,6 +20,10 @@ Or to automatically import an existing Markdown draft:
 
 Inside your newly generated `index.qmd`, you can include manually copied images using the relative path `![](assets/imgs/your-image.png)`.
 
+### Inline Citations
+
+Posts can render source references as academic-style superscript citations (click to jump to a numbered reference list, hover for a preview). This is opt-in per post via `inline-citations: true` in the front matter. See [`citation_instruction_user.md`](citation_instruction_user.md) for the authoring convention, and [`citation_instruction_agent.md`](citation_instruction_agent.md) for the agent that performs the conversion after import.
+
 ### Deleting Blog Posts
 
 If you want to fully delete a post from your repository, do **not** just delete the source folder, as the generated `.html` files will be left behind in the `docs/` folder. Instead, use the included deletion script:

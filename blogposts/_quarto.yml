@@ -50,6 +50,12 @@ format:
     df-print: paged
     fig-align: center
     math: mathjax
+    # Inline citation rendering (see citation_instruction_user.md / citation_instruction_agent.md).
+    # These are inert for posts that contain no citations, so they are safe to set globally.
+    csl: /nature.csl          # superscript numbers + numbered reference list (CC-BY-SA)
+    link-citations: true      # make the superscript a link to its reference entry (NOT a Pandoc default)
+    link-bibliography: true   # make URLs in the reference list clickable (default true; explicit for clarity)
+    citations-hover: true     # hover preview popup of the source (default true; explicit for clarity)
     grid:
       body-width: 850px
       margin-width: 300px
