@@ -39,6 +39,39 @@ Or run interactively:
 
 After deleting a post, just run `quarto render` in the `blogposts/` directory to instantly update your site's index.
 
+## Checking Post Formatting
+
+Exporting a post from Obsidian to `.qmd` tends to leave predictable formatting artifacts — stray LaTeX spacing, malformed tables, `<br>` inside cells, leftover Obsidian syntax, and Obsidian callouts (`> [!note]`) that don't render in Quarto. The included format checker finds these deterministically and can auto-fix the safe ones.
+
+```bash
+./check_post.sh                      # check every post
+./check_post.sh my-post-slug         # check a single post
+./check_post.sh my-post-slug --fix   # check and apply safe fixes without prompting
+./check_post.sh --check              # report only, never prompt (CI-friendly)
+```
+
+**What it does:**
+1. Reports issues grouped by category (Math, Tables, Structure, Links & images, Obsidian artifacts, Front matter, Obsidian callouts), each with a severity (`ERROR` / `WARN` / `INFO`) and line number.
+2. If any issues are auto-fixable, it asks `Auto-fix N fixable issue(s)? [y/N]`. Answering `y` applies only the safe, syntactic fixes (trailing whitespace, heading spacing, blank-line normalization, Obsidian-callout conversion, `==highlight==` → `**bold**`, etc.) and re-verifies.
+3. Anything that needs judgment — stray text, wikilinks, unbalanced math, unmapped callout types — is reported but never auto-edited, so no content is lost.
+
+For example, an Obsidian callout like:
+
+```
+> [!info]- A Note
+> Some content.
+```
+
+is converted to the Quarto equivalent:
+
+```
+::: {.callout-note title="A Note" collapse="true"}
+Some content.
+:::
+```
+
+The checker is a standalone Python tool under `tools/qmd_lint/` (run via `uv`); its rules can be tuned in `tools/qmd_lint/config.py`. Run its tests with `uv run pytest`.
+
 ## Previewing and Publishing
 
 To see a live, auto-updating preview of your blog locally while you write:
