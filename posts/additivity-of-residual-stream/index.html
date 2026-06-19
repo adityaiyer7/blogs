@@ -25,7 +25,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -202,7 +222,7 @@ window.Quarto = {
 
 <section id="decoder-block-diagram" class="level1">
 <h1>Decoder Block Diagram</h1>
-<p><img src="assets/imgs/gpt-2_architecture_diagram.png" class="img-fluid"> Please note that I am not the creator of the diagram; it is taken from <a href="https://medium.com/@hsinhungw/gpt-2-detailed-model-architecture-6b1aad33d16b">this</a> blog post, and all credit is due to the author.</p>
+<p><img src="assets/imgs/gpt-2_architecture_diagram.png" class="img-fluid"> Please note that I am not the creator of the diagram; it is taken from this blog post<span class="citation" data-cites="gpt2arch"><sup><a href="#ref-gpt2arch" role="doc-biblioref">1</a></sup></span>, and all credit is due to the author.</p>
 <p>I’ve added this diagram here for ease of reference, and it doesn’t serve any purpose to the core parts of this blog other than providing a visual to the decoder architecture. Feel free to come back to it whenever needed.</p>
 </section>
 <section id="block-multiplication" class="level1">
@@ -526,10 +546,11 @@ r_t = \tilde r_t + \text{MLP}(\text{LN}_2(\tilde r_t)).
 </section>
 <section id="sources" class="level1">
 <h1>Sources</h1>
-<ol type="1">
-<li><a href="https://medium.com/@hsinhungw/gpt-2-detailed-model-architecture-6b1aad33d16b">GPT-2 Detailed Model Architecture</a></li>
-<li><a href="https://transformer-circuits.pub/2021/framework/index.html">A Mathematical Framework for Transformer Circuits</a></li>
-</ol>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-gpt2arch" class="csl-entry" role="listitem">
+<div class="csl-left-margin">1. </div><div class="csl-right-inline"><a href="https://medium.com/@hsinhungw/gpt-2-detailed-model-architecture-6b1aad33d16b">GPT-2 detailed model architecture</a>.</div>
+</div>
+</div>
 
 
 
