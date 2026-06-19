@@ -25,7 +25,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -271,11 +291,7 @@ window.Quarto = {
 <li><strong>Features</strong>: I think the notion of a feature is somewhat ambiguous when it comes to neural networks, which is one of the significant pain points of neural network interpretability. But, for the purposes of this blog, we follow the same convention used by Anthropic Papers (linked below), and say a feature is a direction in activation space (activation space, is just the vector space where the activation vector lives). This definition is non trivial and implicitly assumes that the linear <a href="https://arxiv.org/abs/2311.03658">representation hypothesis</a> is true.</li>
 </ol>
 <p>If you would like a primer to neural networks, <a href="https://www.youtube.com/watch?v=aircAruvnKk&amp;list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi">here’s</a> a great playlist.</p>
-<p>The following sections heavily borrow from these two papers:</p>
-<ol type="1">
-<li><a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a></li>
-<li><a href="https://transformer-circuits.pub/2023/monosemantic-features">Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.</a></li>
-</ol>
+<p>The following sections heavily borrow from these two papers<span class="citation" data-cites="toymodels monosemanticity"><sup><a href="#ref-toymodels" role="doc-biblioref">1</a>,<a href="#ref-monosemanticity" role="doc-biblioref">2</a></sup></span>.</p>
 <p>I have picked some important terminology for the purposes of this blog. However, there are several nuances that I don’t cover in detail (if at all) to avoid repeating information, but I highly recommend reading them.</p>
 </section>
 </section>
@@ -307,7 +323,7 @@ window.Quarto = {
 <p>However, in a sparse regime, only a few features activate for any given input, so the effect of interference is minimal, helping us pick up the signal from the noise.</p>
 <p>You might be wondering, is this constraint limiting? This constraint isn’t arbitrary; it reflects the structure of real-world data. We design the loss function to enforce sparsity precisely because natural inputs are themselves sparse, as we saw in the penguin example (more on the loss function later). The model isn’t being forced into an artificial regime.</p>
 <p>The way features align across these different regimes is very interesting. As we move into a dense regime, the features become similar to PCA. <img src="assets/imgs/feature_alignment.png" class="img-fluid" alt="Feature alignment"></p>
-<p><em>Source: <a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a></em></p>
+<p><em>Source:<span class="citation" data-cites="toymodels"><sup><a href="#ref-toymodels" role="doc-biblioref">1</a></sup></span></em></p>
 </section>
 <section id="polysemanticity" class="level2">
 <h2 class="anchored" data-anchor-id="polysemanticity">Polysemanticity</h2>
@@ -793,15 +809,18 @@ W_dec[dead_neuron, :] = normalized_vector</code></pre>
 </tr>
 </tbody>
 </table>
-<p>arc</p>
 </section>
 </section>
 <section id="sources" class="level1">
 <h1>Sources</h1>
-<ol type="1">
-<li><a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy Models of Superposition</a></li>
-<li><a href="https://transformer-circuits.pub/2023/monosemantic-features">Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.</a></li>
-</ol>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-toymodels" class="csl-entry" role="listitem">
+<div class="csl-left-margin">1. </div><div class="csl-right-inline"><a href="https://transformer-circuits.pub/2022/toy_model/index.html">Toy models of superposition</a>.</div>
+</div>
+<div id="ref-monosemanticity" class="csl-entry" role="listitem">
+<div class="csl-left-margin">2. </div><div class="csl-right-inline"><a href="https://transformer-circuits.pub/2023/monosemantic-features">Towards monosemanticity: Decomposing language models with dictionary learning</a>.</div>
+</div>
+</div>
 
 
 
