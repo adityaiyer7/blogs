@@ -4,6 +4,8 @@ description: "An exploration of Sparse Autoencoders as a tool for decomposing po
 date: 2026-03-30
 categories: [Interpretability]
 toc: true
+inline-citations: true
+bibliography: references.bib
 ---
 
 
@@ -42,10 +44,7 @@ Before we go into the specifics of Neural Network Interpretability, it's worth r
 
 If you would like a primer to neural networks, [here's](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) a great playlist.  
 
-The following sections heavily borrow from these two papers:
-
-1. [Toy Models of Superposition](https://transformer-circuits.pub/2022/toy_model/index.html)
-2. [Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.](https://transformer-circuits.pub/2023/monosemantic-features)
+The following sections heavily borrow from these two papers [@toymodels; @monosemanticity].
 
 I have picked some important terminology for the purposes of this blog. However, there are several nuances that I don't cover in detail (if at all) to avoid repeating information, but I highly recommend reading them.
 
@@ -81,7 +80,7 @@ You might be wondering, is this constraint limiting? This constraint isn't arbit
 The way features align across these different regimes is very interesting. As we move into a dense regime, the features become similar to PCA.
 ![Feature alignment](assets/imgs/feature_alignment.png)
 
-*Source: [Toy Models of Superposition](https://transformer-circuits.pub/2022/toy_model/index.html)*
+*Source: [@toymodels]*
 
 
 ## Polysemanticity
@@ -436,8 +435,7 @@ model_weights_{expansion_factor}x_{lambda}_{sampling_strategy}.pth
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1e-2                    | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.01_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/0unh5odz?nw=nwuseradityaiyerm)   | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.01_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/8m2jdy4j?nw=nwuseradityaiyerm)   | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.01_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/yi34we3f?nw=nwuseradityaiyerm)   | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.01_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/ruvlwru7?nw=nwuseradityaiyerm)   |
 | 1e-4                    | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_4x_0.0001_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/vg9axgyt?nw=nwuseradityaiyerm) | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_8x_0.0001_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/kxbluv91?nw=nwuseradityaiyerm) | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_16x_0.0001_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/tylzekkv?nw=nwuseradityaiyerm) | [HF Repo](https://huggingface.co/datasets/thedarkknight7/SAE_monosemanticity_features_32x_0.0001_sampling)<br>[WandB Run](https://wandb.ai/adityaiyer-m-self/sae-for-monosemanticity/runs/aez10421?nw=nwuseradityaiyerm) |
-arc
-
 # Sources
-1. [Toy Models of Superposition](https://transformer-circuits.pub/2022/toy_model/index.html)
-2. [Towards Monosemanticity : Decomposing Language Models with Dictionary Learning.](https://transformer-circuits.pub/2023/monosemantic-features)
+
+::: {#refs}
+:::
