@@ -4,117 +4,117 @@
     "href": "index.html",
     "title": "",
     "section": "",
-    "text": "my-post-name\n\n\n\nInterpretability\n\n\n\nBrief description of the post.\n\n\n\n\n\nJun 19, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nThe Additivity of the Residual Stream\n\n\n\nInterpretability\n\n\n\nWhy each attention head and MLP neuron writes its own additive term into the transformer residual stream, following Anthropic’s Mathematical Framework for Transformer Circuits.\n\n\n\n\n\nJun 13, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nA retrospective on the last 100 days - Doing Hard Things\n\n\n\nPersonal\n\n\n\nWhat I mean by hard things, what I don’t, why the neuroscience behind willpower makes a compelling case for doing them anyway, and how that played out over 100 days.\n\n\n\n\n\nJun 5, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nA Walkthrough of Attention\n\n\n\nDeep-Learning\n\n\n\nA GPT-2–style walkthrough of causal self-attention—from a small worked example through single-head and multi-head formulations and their computational graphs.\n\n\n\n\n\nMay 22, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nSparse Autoencoders for Monosemanticity\n\n\n\nInterpretability\n\n\n\nAn exploration of Sparse Autoencoders as a tool for decomposing polysemantic neural network representations into interpretable, monosemantic features.\n\n\n\n\n\nMar 30, 2026\n\n\n\n\n\nNo matching items"
+    "text": "Mechanistic Interpretability Glossary\n\n\n\nInterpretability\n\n\n\nAn informal, evolving glossary of mechanistic interpretability terms, methods, and metrics.\n\n\n\n\n\nJun 19, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nThe Additivity of the Residual Stream\n\n\n\nInterpretability\n\n\n\nWhy each attention head and MLP neuron writes its own additive term into the transformer residual stream, following Anthropic’s Mathematical Framework for Transformer Circuits.\n\n\n\n\n\nJun 13, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nA retrospective on the last 100 days - Doing Hard Things\n\n\n\nPersonal\n\n\n\nWhat I mean by hard things, what I don’t, why the neuroscience behind willpower makes a compelling case for doing them anyway, and how that played out over 100 days.\n\n\n\n\n\nJun 5, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nA Walkthrough of Attention\n\n\n\nDeep-Learning\n\n\n\nA GPT-2–style walkthrough of causal self-attention—from a small worked example through single-head and multi-head formulations and their computational graphs.\n\n\n\n\n\nMay 22, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nSparse Autoencoders for Monosemanticity\n\n\n\nInterpretability\n\n\n\nAn exploration of Sparse Autoencoders as a tool for decomposing polysemantic neural network representations into interpretable, monosemantic features.\n\n\n\n\n\nMar 30, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html",
     "href": "posts/mechanistic-interpretability-glossary/index.html",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "",
     "text": "An informal glossary on various mechanistic interpretability terms, techniques, and metrics. This is inspired by Neel Nanda’s glossary (linked here) and A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models but I thought it might be useful to create my own version to consolidate my learning.\nPlease note that the terms in this glossary are not in any coherent order; they’re just listed randomly. The best way to search this is to use the table of contents or just press Command-F to find what you’re looking for. Also, this post assumes basic familiarity with attention mechanisms and the transformer architecture - check out the following pages if you’d like a refresher: 1. The Illustrated Transformer (Jay Alammar) 2. A Walkthrough of Attention\nLast Updated: 8th June, 2026"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#mechanistic-interpretability",
     "href": "posts/mechanistic-interpretability-glossary/index.html#mechanistic-interpretability",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Mechanistic Interpretability",
     "text": "Mechanistic Interpretability\nMechanistic interpretability is the field of study that aims to reverse-engineer the internal workings of neural networks by analyzing the mechanisms underlying their computations. Source. For more information, see the methods section. (TODO, link)"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#circuits",
     "href": "posts/mechanistic-interpretability-glossary/index.html#circuits",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Circuits",
     "text": "Circuits\n\nComputation Graphs\nNeural networks can be thought of as computational graphs. For example, consider the logistic regression algorithm (logistic regression is equivalent to a one-layer neural network with no hidden layers). Mathematically, it can be represented as \\(y= \\sigma(wx+b)\\) where \\(\\sigma\\) is the sigmoid activation function. This can be represented as a computation graph as follows:\n\n\n\n\n\nflowchart LR\n    w[\"w\"] --&gt; mult((\"mul\"))\n    x[\"x\"] --&gt; mult\n\n    mult --&gt; add((\"add\"))\n    b[\"b\"] --&gt; add\n\n    add --&gt; sigma((\"sigmoid\"))\n    sigma --&gt; y[\"y\"]\n\n\n\n\n\n\nSimilarly, if we wanted to express single-head masked attention as a computational graph, we might have something like this:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"nodeSpacing\": 20, \"rankSpacing\": 25}, \"themeVariables\": {\"fontSize\": \"13px\"}} }%%\nflowchart TB\n    X[\"X\"]\n\n    X --&gt; qProj((\"×\"))\n    Wq[\"Wq\"] --&gt; qProj\n    qProj --&gt; Q[\"Q\"]\n\n    X --&gt; kProj((\"×\"))\n    Wk[\"Wk\"] --&gt; kProj\n    kProj --&gt; K[\"K\"]\n\n    X --&gt; vProj((\"×\"))\n    Wv[\"Wv\"] --&gt; vProj\n    vProj --&gt; V[\"V\"]\n\n    Q --&gt; qkMul((\"×\"))\n    K --&gt; qkMul\n    qkMul --&gt; S[\"QKᵀ\"]\n\n    S --&gt; div((\"÷\"))\n    dk[\"√dₖ\"] --&gt; div\n\n    div --&gt; addMask((\"＋\"))\n    M[\"M\"] --&gt; addMask\n\n    addMask --&gt; sm[\"softmax\"]\n    sm --&gt; P[\"P\"]\n\n    P --&gt; outMul((\"×\"))\n    V --&gt; outMul\n    outMul --&gt; A[\"A\"]\n\n\n\n\n\n\nAs you can see, this is already getting pretty complicated to draw by hand, so I won’t bother with multi-head attention or MLP layers. Hopefully, the point about computational graphs is clear.\nCircuits: In the context of Mechanistic Interpretability, circuits usually focus on the smallest causal subgraph that explains a particular behavior (I’m using the word smallest loosely here). However, it’s important to note that when we’re talking about circuits, we typically do not go into the same level of granularity as we did above (i.e., our nodes are usually not as granular as weights). Typically, when we’re talking about circuits, our nodes could be model components (i.e an attention head could be a node). For example, a one-layer transformer represented at the granularity of model components could be represented as:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"nodeSpacing\": 12, \"rankSpacing\": 18}, \"themeVariables\": {\"fontSize\": \"12px\"}} }%%\nflowchart TB\n    T[\"tokens\"] --&gt; E[\"embed\"]\n    E --&gt; R0[\"resid 0\"]\n\n    R0 --&gt; LN1[\"LN\"]\n    LN1 --&gt; H0[\"L0H0\"]\n    LN1 --&gt; H1[\"L0H1\"]\n    LN1 --&gt; H2[\"L0H2\"]\n    LN1 --&gt; H3[\"L0H3\"]\n\n    H0 --&gt; AO[\"attn out\"]\n    H1 --&gt; AO\n    H2 --&gt; AO\n    H3 --&gt; AO\n\n    R0 --&gt; ADD1[\"resid add\"]\n    AO --&gt; ADD1\n    ADD1 --&gt; R1[\"resid 1\"]\n\n    R1 --&gt; LN2[\"LN\"]\n    LN2 --&gt; MLP[\"MLP\"]\n\n    R1 --&gt; ADD2[\"resid add\"]\n    MLP --&gt; ADD2\n    ADD2 --&gt; R2[\"resid 2\"]\n\n    R2 --&gt; LN3[\"final LN\"]\n    LN3 --&gt; U[\"unembed\"]\n    U --&gt; Y[\"logits\"]\n\n\n\n\n\n\nNote that the diagram above is not a circuit; it’s a model representation. Hypothetically, let’s say the model predicts the next token by using one attention head to route relevant context, then an MLP transforms/amplifies that information, and the unembedding reads it out. In that case, our circuit looks something like this (note we’re omitting Layer Norm as an abstraction choice):\n\n\n\n\n\n%%{init: {\"flowchart\": {\"nodeSpacing\": 10, \"rankSpacing\": 16}, \"themeVariables\": {\"fontSize\": \"12px\"}} }%%\nflowchart TB\n    T[\"tokens\"] --&gt; E[\"embed\"]\n    E --&gt; R0[\"resid 0\"]\n\n    R0 --&gt; H2[\"L0H2&lt;br/&gt;relevant head\"]\n    H2 --&gt; R1[\"resid 1\"]\n\n    R1 --&gt; M[\"MLP&lt;br/&gt;feature transform\"]\n    M --&gt; R2[\"resid 2\"]\n\n    R2 --&gt; U[\"unembed\"]\n    U --&gt; Y[\"target logit\"]\n\n    H2 -. \"routes info\" .-&gt; M\n    M -. \"boosts feature\" .-&gt; U\n\n\n\n\n\n\nOnce the circuit is identified, we analyze each node (component) to determine its role in the circuit’s behavior. Some tools for analyzing components include Linear Probes and Sparse Auto Encoders (among others).\nHere’s a more concise image, talking about circuit discovery and interpretability: \nSource: A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#features",
     "href": "posts/mechanistic-interpretability-glossary/index.html#features",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Features",
     "text": "Features\nIn traditional machine learning (statistical learning techniques), features are handcrafted. Think back to the canonical example of predicting house prices with linear regression. In most of these models, we handcraft certain features that the model uses to make its prediction. In that sense, features can be described as inputs that the model uses to make its prediction. However, in the context of deep learning, that definition breaks down because we don’t provide handcrafted features to models. Instead, we just throw data at the models and let them figure out what features are, which is why features in the context of deep learning are extremely tricky to define. Therefore, we end up doing this whole song and dance of trying to interpret these models. While I’m not terribly happy with this definition, a working definition people seem to use is as follows: a feature is a human-interpretable property encoded in activations.\nSource: A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#attention-logit",
     "href": "posts/mechanistic-interpretability-glossary/index.html#attention-logit",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Attention Logit",
     "text": "Attention Logit\nThis term refers to the pre-softmax attention scores. \\[\n\\text{attention logit} = QK^{T}/\\sqrt{d_k}\n\\]"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#logit",
     "href": "posts/mechanistic-interpretability-glossary/index.html#logit",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Logit",
     "text": "Logit\nIn statistics, a logit is typically defined as the log odds ratio, so mathematically it is \\(\\text{log}(p/1-p)\\) In deep learning, the logit has a slightly different meaning. A logit is technically the unnormalized, raw scores before it gets normalized. For example, the attention scores before it goes through the softmax are the attention logit (see above). Note, it does not have to always go through a normalizing function. For example, in the literature, MLP scores are also called logits, but they do not go through a normalizing function (since they’re typically paired with RELU/GELU).\nI like to think about it simply as the pre-activation function scores."
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#superposition",
     "href": "posts/mechanistic-interpretability-glossary/index.html#superposition",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Superposition",
     "text": "Superposition"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#residual-stream",
     "href": "posts/mechanistic-interpretability-glossary/index.html#residual-stream",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Residual Stream",
     "text": "Residual Stream"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#linear-representation-hypothesis",
     "href": "posts/mechanistic-interpretability-glossary/index.html#linear-representation-hypothesis",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Linear Representation Hypothesis",
     "text": "Linear Representation Hypothesis"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#linear-probing",
     "href": "posts/mechanistic-interpretability-glossary/index.html#linear-probing",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Linear Probing",
     "text": "Linear Probing"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#sparse-autoencoder-sae",
     "href": "posts/mechanistic-interpretability-glossary/index.html#sparse-autoencoder-sae",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Sparse Autoencoder (SAE)",
     "text": "Sparse Autoencoder (SAE)"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#natural-language-autoencoder-nla",
     "href": "posts/mechanistic-interpretability-glossary/index.html#natural-language-autoencoder-nla",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Natural Language Autoencoder (NLA)",
     "text": "Natural Language Autoencoder (NLA)"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#activation-patching",
     "href": "posts/mechanistic-interpretability-glossary/index.html#activation-patching",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Activation Patching",
     "text": "Activation Patching\n\nStandard Activation Patching\nIn standard activation patching, we patch the output activations of a given component in the circuit. Once this component’s output is replaced, we let the model run normally from that point onward. As a result, any downstream component that reads from or depends on those activations can be affected.\nThis tells us whether the component matters for the behavior, but it does not by itself tell us which downstream path or connection is responsible for that effect.\n\n\nPath Patching\nThis is a patching technique that helps us distinguish between two questions:\n\nDoes this component matter?\nDoes this component matter directly, or does it only contribute indirectly through downstream components?\n\nIn general, if you think of a circuit as a computational graph, you could go in and patch across any edge, or even multiple edges, thereby defining a path through the graph. By patching, I mean replacing the activation values at a given component or layer with the corresponding values from a clean run, using those from a corrupted run.\nOf course, patching directly through the residual stream is also feasible since it is linear. For example, if you wanted to test whether the MLP at Layer 10 of a transformer directly contributes to the output, you could intervene on the residual stream before the final logits are computed and patch in the contribution of MLP 10. Similarly, you could do this along other edges. For instance, if you wanted to study how MLP 10 affects MLP 11, you could patch the contribution of MLP 10 at the point where MLP 11 reads from the residual stream.\nNote that this differs from pure activation patching, in which we patch the output activations of a given component and then allow all its downstream effects to propagate normally.\nA paper that I found useful to intuitively understand this concept is linked here.\n\n\nSubspace Activation Patching\n\n\nAttribution Patching\n\n\nEdge Attribution Patching"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#subspace-geometry-physics-interp-paper",
     "href": "posts/mechanistic-interpretability-glossary/index.html#subspace-geometry-physics-interp-paper",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Subspace Geometry (Physics Interp paper)",
     "text": "Subspace Geometry (Physics Interp paper)"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#patch-level-decoding-physics-interp-paper",
     "href": "posts/mechanistic-interpretability-glossary/index.html#patch-level-decoding-physics-interp-paper",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Patch Level Decoding (Physics Interp paper)",
     "text": "Patch Level Decoding (Physics Interp paper)"
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#integrated-gradients",
     "href": "posts/mechanistic-interpretability-glossary/index.html#integrated-gradients",
-    "title": "my-post-name",
+    "title": "Mechanistic Interpretability Glossary",
     "section": "Integrated Gradients",
     "text": "Integrated Gradients"
   },
