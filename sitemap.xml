@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://adityaiyer7.github.io/blogs/index.html</loc>
-    <lastmod>2026-06-19T05:50:40.169Z</lastmod>
+    <lastmod>2026-06-20T04:54:48.221Z</lastmod>
   </url>
   <url>
-    <loc>https://adityaiyer7.github.io/blogs/posts/hundred-day-retrospective/index.html</loc>
-    <lastmod>2026-06-19T05:50:40.173Z</lastmod>
-  </url>
-  <url>
-    <loc>https://adityaiyer7.github.io/blogs/posts/additivity-of-residual-stream/index.html</loc>
-    <lastmod>2026-06-19T05:50:40.170Z</lastmod>
+    <loc>https://adityaiyer7.github.io/blogs/posts/mechanistic-interpretability-glossary/index.html</loc>
+    <lastmod>2026-06-20T04:54:48.226Z</lastmod>
   </url>
   <url>
     <loc>https://adityaiyer7.github.io/blogs/posts/sae-for-monosemanticity/index.html</loc>
-    <lastmod>2026-06-19T05:50:40.188Z</lastmod>
+    <lastmod>2026-06-20T04:54:48.240Z</lastmod>
+  </url>
+  <url>
+    <loc>https://adityaiyer7.github.io/blogs/posts/additivity-of-residual-stream/index.html</loc>
+    <lastmod>2026-06-20T04:54:48.222Z</lastmod>
+  </url>
+  <url>
+    <loc>https://adityaiyer7.github.io/blogs/posts/hundred-day-retrospective/index.html</loc>
+    <lastmod>2026-06-20T04:54:48.225Z</lastmod>
   </url>
   <url>
     <loc>https://adityaiyer7.github.io/blogs/posts/attention-mechanism/index.html</loc>
-    <lastmod>2026-06-19T05:50:40.172Z</lastmod>
+    <lastmod>2026-06-20T04:54:48.224Z</lastmod>
   </url>
 </urlset>
