@@ -12,6 +12,8 @@ _HIGHLIGHT_RE = re.compile(r"==([^=\n]+)==")
 _COMMENT_RE = re.compile(r"%%(.*?)%%")
 _TAG_RE = re.compile(r"^#[A-Za-z][\w/-]*(\s|$)")
 _BLOCKREF_RE = re.compile(r"\s+\^[\w-]+\s*$")
+# Opening fence of an Obsidian mermaid block: ```mermaid (vs Quarto's ```{mermaid}).
+_MERMAID_FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})\s*mermaid\s*$")
 
 
 def _body_lines(doc: Document):
@@ -96,4 +98,29 @@ def e5_block_refs(doc: Document) -> list[Finding]:
                     fix=Fix(line=ln.number, new_text=new),
                 )
             )
+    return out
+
+
+@rule("E6", "E", Severity.WARNING, fixable=True)
+def e6_mermaid_fence(doc: Document) -> list[Finding]:
+    """Obsidian writes ```mermaid; Quarto only renders the executable cell form
+    ```{mermaid}. We rewrite just the opening fence (the body and closing fence
+    are untouched). Only the opening fence of each code block is considered, so a
+    stray ``mermaid`` word inside another block can't be misfired on."""
+    out = []
+    for start, _end in doc.code_fences:
+        m = _MERMAID_FENCE_RE.match(doc.line_text(start))
+        if not m:
+            continue
+        new = f"{m.group(1)}{m.group(2)}{{mermaid}}"
+        out.append(
+            Finding(
+                "E6",
+                Severity.WARNING,
+                start,
+                "Obsidian ```mermaid block — converting to Quarto ```{mermaid}",
+                fixable=True,
+                fix=Fix(line=start, new_text=new),
+            )
+        )
     return out
