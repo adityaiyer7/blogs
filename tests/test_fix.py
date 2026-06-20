@@ -49,6 +49,35 @@ def test_unknown_callout_not_converted(fix):
     assert any(f.rule_id == "N4" for f in remaining)
 
 
+def test_callout_body_delete_beats_same_line_whitespace_fix(fix):
+    # Regression: a callout body line that ALSO needs a cosmetic fix (trailing
+    # whitespace) must still be removed when N1 folds it into the div. Previously
+    # the C4 whitespace fix clobbered N1's same-line deletion, leaving a stray
+    # duplicate blockquote line below the converted callout.
+    text, _, _ = fix("> [!note]\n> live blog body   \n")
+    assert "::: {.callout-note}" in text
+    assert "live blog body" in text  # content preserved inside the div
+    assert "> live blog body" not in text  # no stray leftover blockquote
+    assert "[!note]" not in text
+
+
+def test_mermaid_fence_conversion(fix):
+    text, _, _ = fix("```mermaid\nflowchart TB\n  A --> B\n```\n")
+    assert "```{mermaid}" in text
+    assert "flowchart TB" in text and "A --> B" in text  # body preserved
+    # The plain Obsidian opening fence is gone (closing ``` legitimately remains).
+    assert "```mermaid\n" not in text + "\n"
+
+
+def test_mermaid_init_directive_survives(fix):
+    # ``%%{init}%%`` is also Obsidian's comment syntax (E3), but inside the fence
+    # it must be left intact — it's mermaid configuration, not a comment.
+    body = '```mermaid\n%%{init: {"themeVariables": {"fontSize": "13px"}} }%%\nflowchart TB\n  A --> B\n```\n'
+    text, _, _ = fix(body)
+    assert "```{mermaid}" in text
+    assert '%%{init:' in text  # directive not stripped
+
+
 def test_stray_text_not_autofixed(write_qmd):
     # B7 surfaces the stray token on the initial report; the auto-fixer must
     # never delete it. (The B5 blank-line insertion then separates it from the

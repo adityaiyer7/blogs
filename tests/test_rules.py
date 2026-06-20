@@ -76,6 +76,20 @@ def test_e2_highlight(rule_ids):
     assert "E2" in rule_ids("This is ==important== text.\n")
 
 
+def test_e6_mermaid_fence_detected(rule_ids):
+    assert "E6" in rule_ids("```mermaid\nflowchart TB\n  A --> B\n```\n")
+
+
+def test_e6_quarto_mermaid_not_flagged(rule_ids):
+    # Already in Quarto executable-cell form — must be left alone (idempotence).
+    assert "E6" not in rule_ids("```{mermaid}\nflowchart TB\n  A --> B\n```\n")
+
+
+def test_e6_plain_code_block_not_flagged(rule_ids):
+    # A bare ``mermaid`` word inside another language's block must not misfire.
+    assert "E6" not in rule_ids("```python\nx = 'mermaid'\n```\n")
+
+
 # --- Category F: front matter -----------------------------------------------
 
 def test_f1_missing_key(write_qmd, lint):

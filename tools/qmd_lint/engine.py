@@ -37,7 +37,15 @@ def _rule_enabled(rule_id: str, category: str, only: set[str] | None, skip: set[
 
 
 def apply_fixes(raw_lines: list[str], fixes: list[Fix]) -> list[str]:
-    """Apply line-oriented fixes, producing a new list of lines."""
+    """Apply line-oriented fixes, producing a new list of lines.
+
+    When two fixes land on the same line, a deletion wins: the line is going
+    away, so any text replacement targeting it (e.g. a cosmetic whitespace trim
+    on a callout body line that N1 is folding into a div) is moot. Without this,
+    whichever fix was processed last silently clobbered the other — which left
+    stray duplicate lines when a structural delete collided with a same-line edit.
+    """
+    deleted: set[int] = set()
     replaced: dict[int, str | None] = {}
     inserts: dict[int, list[str]] = defaultdict(list)
     for f in fixes:
@@ -45,8 +53,9 @@ def apply_fixes(raw_lines: list[str], fixes: list[Fix]) -> list[str]:
         if f.insert_before is not None:
             inserts[idx].append(f.insert_before)
         elif f.delete:
+            deleted.add(idx)
             replaced[idx] = None
-        elif f.new_text is not None:
+        elif f.new_text is not None and idx not in deleted:
             replaced[idx] = f.new_text
     out: list[str] = []
     for idx, line in enumerate(raw_lines):
