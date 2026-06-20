@@ -4,11 +4,13 @@ description: "Why each attention head and MLP neuron writes its own additive ter
 date: 2026-06-13
 categories: [Interpretability]
 toc: true
+inline-citations: true
+bibliography: references.bib
 ---
 
 # Decoder Block Diagram
 ![](assets/imgs/gpt-2_architecture_diagram.png)
-Please note that I am not the creator of the diagram; it is taken from [this](https://medium.com/@hsinhungw/gpt-2-detailed-model-architecture-6b1aad33d16b) blog post, and all credit is due to the author. 
+Please note that I am not the creator of the diagram; it is taken from this blog post [@gpt2arch], and all credit is due to the author. 
 
 I've added this diagram here for ease of reference, and it doesn't serve any purpose to the core parts of this blog other than providing a visual to the decoder architecture. Feel free to come back to it whenever needed. 
 
@@ -389,5 +391,5 @@ Feedback is always welcome! If you have any comments on how things could have be
 
 # Sources
 
-1. [GPT-2 Detailed Model Architecture ](https://medium.com/@hsinhungw/gpt-2-detailed-model-architecture-6b1aad33d16b)
-2. [A Mathematical Framework for Transformer Circuits ](https://transformer-circuits.pub/2021/framework/index.html)
+::: {#refs}
+:::

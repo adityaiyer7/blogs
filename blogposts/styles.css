@@ -273,6 +273,27 @@ blockquote {
   border-top: 1px solid var(--border);
 }
 
+/* ── Bibliography / citations ────────────────────────────────── */
+#refs {
+  font-family: var(--ui-font);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Applied globally so the citation hover popup (rendered outside #refs) also picks this up. */
+div.csl-entry {
+  margin-bottom: 0.4rem;
+}
+
+div.csl-left-margin,
+div.csl-right-inline {
+  display: inline;
+  float: none;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   :root { --content-width: 100%; }

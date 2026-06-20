@@ -64,6 +64,10 @@ cd blogposts && quarto render   # or: quarto preview
 
 This matters even when the `.qmd` source already looks correct. Quarto decides whether to inject diagram-rendering JS (e.g. for ` ```{mermaid} ` blocks) at render time, based on what's in the source *at that render*. If `docs/` was last rendered before a post had `` ```{mermaid} `` syntax, the stale HTML page will be missing that script — its Mermaid diagrams will silently show up as plain text instead of rendered diagrams, with no error anywhere. Re-rendering after every sync is what keeps `docs/` consistent with the source. (Pushing to `master` has CI render for you — see "Previewing and Publishing" below — but anything you check locally needs an explicit render first.)
 
+### Inline Citations
+
+Posts can render source references as academic-style superscript citations (click to jump to a numbered reference list, hover for a preview). This is opt-in per post via `inline-citations: true` in the front matter. See [`citation_instruction_user.md`](citation_instruction_user.md) for the authoring convention, and [`citation_instruction_agent.md`](citation_instruction_agent.md) for the agent that performs the conversion after import.
+
 ### Deleting Blog Posts
 
 If you want to fully delete a post from your repository, do **not** just delete the source folder, as the generated `.html` files will be left behind in the `docs/` folder. Instead, use the included deletion script:
