@@ -1,6 +1,6 @@
 ---
-title: "my-post-name"
-description: "Brief description of the post."
+title: "Mechanistic Interpretability Glossary"
+description: "An informal, evolving glossary of mechanistic interpretability terms, methods, and metrics."
 date: 2026-06-19
 categories: [Interpretability]
 toc: true
