@@ -2,7 +2,7 @@ website:
   navbar:
     left:
       - text: "Home"
-        href: "https://iambatman.live/"
+        href: "https://adityaiyer.org/"
       - text: "Blogs"
         href: "/"
     right:
