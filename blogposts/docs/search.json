@@ -214,7 +214,7 @@
     "href": "posts/mechanistic-interpretability-glossary/index.html#residual-stream",
     "title": "Mechanistic Interpretability Glossary",
     "section": "Residual Stream",
-    "text": "Residual Stream"
+    "text": "Residual Stream\nThe residual stream is a component of the transformer architecture - it doesn’t have a precise definition per se, but it’s most often thought of as a communication channel, allowing different parts of the model to read and write into different subspaces of the residual stream. One helpful analogy I got from notebookLM is to think of the residual stream as a whiteboard passed down a line of students, where each student reads and writes on it. The residual stream is extremely important from an interpretability perspective. One of the primary reasons is that the attention heads and MLP neurons enforce additivity in the residual stream, allowing us to isolate the effect of each component via Path Patching. For a more detailed explanation of the residual stream’s additivity, see my post here. For more on Path Patching, search this document (command/control + F)."
   },
   {
     "objectID": "posts/mechanistic-interpretability-glossary/index.html#linear-representation-hypothesis",

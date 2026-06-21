@@ -17,7 +17,7 @@ Please note that the terms in this glossary are not in any coherent order; they'
 | Terminology | Features                     | Ready  |
 | Terminology | Attention Logit <br>         | WIP    |
 | Terminology | Logit                        | WIP    |
-|             |                              |        |
+| Terminology | Residual Stream              | Ready  |
 | Methods     | Standard Activation Patching | WIP    |
 | Methods     | Path Patching                | WIP    |
 |             |                              |        |
@@ -168,6 +168,10 @@ I like to think about it simply as the pre-activation function scores.
 ## Superposition
 
 ## Residual Stream
+The residual stream is a component of the transformer architecture - it doesn't have a precise definition per se, but it's most often thought of as a communication channel, allowing different parts of the model to read and write into different subspaces of the residual stream. One helpful analogy I got from notebookLM is to think of the residual stream as a whiteboard passed down a line of students, where each student reads and writes on it. The residual stream is extremely important from an interpretability perspective. One of the primary reasons is that the attention heads and MLP neurons enforce additivity in the residual stream, allowing us to isolate the effect of each component via Path Patching. 
+For a more detailed explanation of the residual stream's additivity, see my post [here](https://adityaiyer7.github.io/blogs/posts/additivity-of-residual-stream/).
+For more on Path Patching, search this document (command/control + F). 
+
 
 ## Linear Representation Hypothesis 
 
