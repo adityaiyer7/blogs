@@ -5,6 +5,8 @@ website:
         href: "https://adityaiyer.org/"
       - text: "Blogs"
         href: "/"
+      - text: "Reading Group"
+        href: "/reading-group/"
     right:
       - icon: "github"
         href: "https://github.com/adityaiyer7"

@@ -1,0 +1,38 @@
+---
+title: "Reading Group"
+description: "A paper-by-paper exploration of mechanistic interpretability, from foundational methods to modern circuit discovery."
+toc: true
+toc-location: body
+comments: false
+---
+
+# Introduction
+
+This is a small reading group working through foundational and recent papers in mechanistic interpretability; the effort to reverse-engineer the internal computations of neural networks into human-understandable algorithms. Each session centers on one paper, presented in depth, with an emphasis on building intuition for the methods (activation patching, circuit analysis, causal tracing) as well as the specific findings.
+
+Sessions are sequenced deliberately: earlier papers introduce the tools and vocabulary (attention head taxonomy, patching, attribution) that later papers depend on, building toward more complex circuit-discovery techniques and current work on superposition and sparse autoencoders.
+
+We expect to continue beyond the papers currently listed below -- this is simply what's been planned so far.
+
+# Useful Links
+
+1. [Reading Group Calendar](https://luma.com/calendar/cal-Ug3DM2lZycfcd8U)
+2. [Presenter Form](https://forms.gle/wpi5tJbi8CrKikEi8?utm_source=luma) (fill this out if you're interested in presenting)
+3. [Paper Suggestion Form](https://forms.gle/cfK2fPTtWNP8Gw9a6?utm_source=luma)
+
+# Schedule
+
+*This schedule is tentative and subject to change.*
+
+| Session Number | Date         | Paper                                                                                                                                                                                         | Slides      | Interactive Visualizations |
+| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------------------------- |
+| 1              | Jun 17, 2026 | [How does GPT-2 compute greater-than?: Interpreting mathematical abilities in a pre-trained language model](https://arxiv.org/abs/2305.00586)                                                 | Coming Soon | Coming Soon                |
+| 2              | Jun 24, 2026 | [In-context Learning and Induction Heads](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html)                                                           | Coming Soon | Coming Soon                |
+| 3              | Jul 1, 2026  | [Axiomatic Attribution for Deep Networks](https://arxiv.org/abs/1703.01365)                                                                                                                   | Coming Soon | Coming Soon                |
+| 4              | Jul 8, 2026  | [Interpretability in the Wild: A Circuit for Indirect Object Identification in GPT-2 small](https://arxiv.org/abs/2211.00593)                                                                 | Coming Soon | Coming Soon                |
+| 5              | Jul 15, 2026 | [A Circuit for Python Docstrings in a 4-Layer Attention-Only Transformer](https://www.alignmentforum.org/posts/u6KXXmKFbXfWzoAXn/a-circuit-for-python-docstrings-in-a-4-layer-attention-only) | Coming Soon | Coming Soon                |
+| 6              | Jul 22, 2026 | [A Mathematical Framework for Transformer Circuits](https://transformer-circuits.pub/2021/framework/index.html)                                                                               | Coming Soon | Coming Soon                |
+| 7              | Jul 29, 2026 | [Towards Automated Circuit Discovery for Mechanistic Interpretability](https://arxiv.org/abs/2304.14997)                                                                                      | Coming Soon | Coming Soon                |
+| 8              | Aug 5, 2026  | [Attribution Patching: Activation Patching At Industrial Scale](https://www.neelnanda.io/mechanistic-interpretability/attribution-patching)                                                   | Coming Soon | Coming Soon                |
+| 9              | Aug 12, 2026 | [Attribution Patching Outperforms Automated Circuit Discovery](https://arxiv.org/abs/2310.10348)                                                                                              | Coming Soon | Coming Soon                |
+| 10             | Aug 19, 2026 | [Toward Monosemanticity: Decomposing Language Models With Dictionary Learning](https://transformer-circuits.pub/2023/monosemantic-features/index.html)                                        | Coming Soon | Coming Soon                |
