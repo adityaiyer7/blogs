@@ -154,5 +154,11 @@ else
     echo -e "# Introduction\n\nWrite your post content here...\n\nTo embed an image, use: \`![](assets/imgs/your-image.png)\`" >> "$TARGET_DIR/index.qmd"
 fi
 
+# Convert any {citation:handle} tags in the draft into Quarto/Pandoc citations
+# and build references.bib. No-ops cleanly if the draft has no citation tags.
+echo ""
+echo "🔧 Converting citation tags via convert_citations.sh…"
+./convert_citations.sh "$POST_SLUG"
+
 echo "✅ Created new post structure at '$TARGET_DIR'"
 echo "✅ Assets folder created at '$ASSETS_DIR'"

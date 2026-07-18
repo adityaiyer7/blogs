@@ -138,5 +138,12 @@ echo ""
 echo "🔧 Applying Quarto format fixes via check_post.sh…"
 ./check_post.sh "$POST_SLUG" --fix
 
+# Regenerating from the raw Obsidian draft also reverts any previous citation
+# conversion (the {citation:handle} tags come back). Re-convert them into
+# Quarto/Pandoc citations and rebuild references.bib.
+echo ""
+echo "🔧 Converting citation tags via convert_citations.sh…"
+./convert_citations.sh "$POST_SLUG"
+
 echo ""
 echo "ℹ️ Run 'cd blogposts && quarto preview' to preview, or push to render via CI."
