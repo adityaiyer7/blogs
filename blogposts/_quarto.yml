@@ -5,6 +5,16 @@ project:
 metadata-files:
   - _links.yml
 
+# Estimated reading time. Native to Quarto listings only; this filter also
+# surfaces it on individual post pages (see filters/reading-time.lua).
+filters:
+  - filters/reading-time.lua
+
+# Render the native listing reading-time string as "N min read" (default is
+# "N min") so listing cards and post pages read identically.
+language:
+  listing-page-minutes-compact: "{0} min read"
+
 website:
   description: "Notes on mechanistic interpretability and machine learning."
   site-url: https://adityaiyer7.github.io/blogs
