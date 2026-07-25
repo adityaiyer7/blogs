@@ -23,7 +23,7 @@ Or to import a whole **project directory** (a single `.md` plus an `assets/` fol
 4. If no `.md` draft is provided, it simply creates a starter `index.qmd` file with pre-filled front matter.
 
 **Project mode (`--project <dir>`):** point the script at a directory that contains exactly one top-level `.md` file and an `assets/` folder. In addition to the draft-import behavior above, it:
-- mirrors the source `assets/` tree into the post's `assets/` folder, preserving any subfolders (`imgs/`, `diagrams/`, …);
+- mirrors the source `assets/` tree into the post's `assets/` folder, preserving any subfolders (`imgs/`, `diagrams/`, …) and routing top-level images into `assets/imgs/` (see [Where images land](#where-images-land));
 - rewrites Obsidian image embeds — `![[image.png]]` and `![[image.png|caption]]` — into working Quarto links like `![](assets/imgs/image.png)`, resolving each file by basename against the copied assets;
 - leaves an embed untouched and prints a warning if no matching asset is found, or if the same filename exists in multiple folders (ambiguous) — nothing is silently dropped or guessed.
 
@@ -43,7 +43,7 @@ The `--project` directory is the same shape as in project mode: exactly one top-
 
 **What the script does:**
 1. Overwrites `_draft.md` with the latest Obsidian draft.
-2. Re-mirrors the source `assets/` tree into the post's `assets/` folder, one file at a time, asking what to do whenever an incoming filename already exists elsewhere in the post (see [Asset name collisions](#asset-name-collisions)).
+2. Re-mirrors the source `assets/` tree into the post's `assets/` folder, one file at a time — routing top-level images into `assets/imgs/` (see [Where images land](#where-images-land)) and asking what to do whenever an incoming filename already exists elsewhere in the post (see [Asset name collisions](#asset-name-collisions)).
 3. Regenerates the **body** of `index.qmd` from the fresh draft, re-running the same Obsidian-embed rewriting and heading normalization as `create_post.sh`.
 4. Runs `check_post.sh <slug> --fix` to apply the safe, deterministic fixes (Obsidian ` ```mermaid ` blocks → Quarto ` ```{mermaid} `, `[!NOTE]`-style callouts → `::: {.callout-note}`, etc.) so the regenerated body is render-ready, not just re-imported.
 
@@ -53,9 +53,20 @@ The `--project` directory is the same shape as in project mode: exactly one top-
 
 **Caveat:** the asset sync is additive. Images removed in Obsidian are not deleted from the post's `assets/` folder; remove those manually if you want them gone.
 
+#### Where images land
+
+Obsidian vaults usually keep images flat at the top of `assets/`, but posts in this repo expect them under `assets/imgs/` — `check_post.sh` reports anything else as a `D2` warning, and `D2` is one it cannot fix for you (a fix would have to move the file, not just edit a line). So both scripts route on the way in: an image sitting at the top level of the source `assets/` folder is written to `assets/imgs/` instead, and the embed rewrite picks up the new path on its own. Sync a post whose Obsidian assets are flat and you get `![](assets/imgs/tube.png)` with no manual move or path fixup afterwards.
+
+Two things are deliberately left alone:
+
+- **Files already in a subfolder.** `assets/diagrams/flow.png` stays in `diagrams/`; routing never reorganizes a layout you chose.
+- **Non-images.** Only `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.avif`, `.bmp`, `.tif`, and `.tiff` move, so build inputs that belong flat next to the images they generate (the `.tex`/`.aux`/`.dvi`/`.log` sources in `attention-mechanism`, for example) keep their place.
+
+A post synced before routing existed cleans itself up on its next sync: the flat copy left behind is removed once the routed copy is written.
+
 #### Asset name collisions
 
-Embeds are resolved by *basename*, so the same filename living in two different folders inside a post makes `![[image.png]]` unresolvable — the embed is left as-is and `check_post.sh` reports it as a non-fixable `E1`. This happens easily: reorganize a post's images into `assets/imgs/`, then sync again from an Obsidian project that still keeps them flat, and you end up with both copies.
+Embeds are resolved by *basename*, so the same filename living in two different folders inside a post makes `![[image.png]]` unresolvable — the embed is left as-is and `check_post.sh` reports it as a non-fixable `E1`. Routing handles the common flat-vs-`imgs/` version of this, but it can still happen when the same filename exists in some *other* folder — say `assets/diagrams/diagram.png` in the repo while Obsidian ships `diagram.png` at the top level.
 
 The sync detects that case per file and resolves it instead of stacking duplicates:
 
@@ -64,9 +75,9 @@ The sync detects that case per file and resolves it instead of stacking duplicat
 
   ```
   ⚠️  Asset name collision: 'diagram.png'
-        incoming (Obsidian): assets/diagram.png
-        existing (repo):     assets/imgs/diagram.png
-     a) Override      — write the Obsidian version into assets/imgs/diagram.png
+        incoming (Obsidian): assets/imgs/diagram.png
+        existing (repo):     assets/diagrams/diagram.png
+     a) Override      — write the Obsidian version into assets/diagrams/diagram.png
      b) Keep existing — discard the incoming copy
      c) Keep both     — leaves the embed unresolved (E1) for manual fixup
   Choose [a/b/c] (A/B/C applies to all remaining):
@@ -74,7 +85,9 @@ The sync detects that case per file and resolves it instead of stacking duplicat
 
   Answering with a capital `A`, `B`, or `C` applies that choice to every remaining collision in the run.
 
-Note that **override writes into the *existing* path**, so a post whose images you moved into `assets/imgs/` keeps that layout (and stays clear of the `D2` warning) while still picking up the newer bytes from Obsidian.
+Note that **override writes into the *existing* path**, so the post keeps whatever layout you chose for that file while still picking up the newer bytes from Obsidian.
+
+One case is never resolved for you: if the routed target *and* another folder both already hold the filename, the post is ambiguous in a way no policy can settle without guessing. The incoming file is written to `assets/imgs/` as an ordinary update, the other copies are listed and left untouched, and the `E1` is yours to resolve.
 
 To skip the prompt — in a script, or to fix a whole reorganized post in one pass — pass a policy up front:
 

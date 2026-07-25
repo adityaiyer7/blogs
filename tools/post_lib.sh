@@ -62,15 +62,71 @@ drop_stale_duplicate() {
     echo "   🧹 Removed the stale duplicate at '$label'"
 }
 
+# Image extensions that get routed into assets/imgs/. Deliberately narrow: build
+# inputs that legitimately sit flat in assets/ (e.g. the .tex/.aux/.dvi/.log LaTeX
+# sources in the attention-mechanism post) must keep their place.
+POST_IMAGE_EXTENSIONS="png jpg jpeg gif svg webp avif bmp tif tiff"
+
+# Echo the path an incoming asset should land on inside the post's assets/ folder,
+# given its path $1 relative to the source assets root $2.
+#
+# Obsidian vaults keep images flat at the top of assets/, but the repo convention
+# (check_post.sh rule D2) is that images live under assets/imgs/. Routing them on
+# the way in means rewrite_obsidian_embeds resolves ![[foo.png]] straight to
+# assets/imgs/foo.png — no manual move plus path fixup after every sync, and D2
+# never fires (it is a warning the linter cannot fix, since fixes are line edits
+# and this needs a file move).
+#
+# Only top-level image files move; anything already in a subfolder keeps the layout
+# it was authored with. A flat file is also left alone when the source ships its
+# own imgs/<name> too, because routing would collapse two distinct incoming files
+# onto one path — that stays a real collision for sync_assets_tree to resolve.
+route_asset_relpath() {
+    local rel="$1"
+    local src_root="$2"
+
+    # Already in a subfolder — respect the author's layout.
+    case "$rel" in
+        */*) printf '%s\n' "$rel"; return 0 ;;
+    esac
+
+    local ext="${rel##*.}"
+    # No extension at all ("${rel##*.}" returns the whole name) — not an image.
+    if [ "$ext" = "$rel" ]; then
+        printf '%s\n' "$rel"
+        return 0
+    fi
+    ext="$(printf '%s' "$ext" | tr '[:upper:]' '[:lower:]')"
+
+    case " $POST_IMAGE_EXTENSIONS " in
+        *" $ext "*) ;;
+        *) printf '%s\n' "$rel"; return 0 ;;
+    esac
+
+    # Routing this would land on top of a different incoming file.
+    if [ -e "$src_root/imgs/$rel" ]; then
+        printf '%s\n' "$rel"
+        return 0
+    fi
+
+    printf '%s\n' "imgs/$rel"
+}
+
 # Mirror an Obsidian project's assets/ tree into a post's assets/ folder one file
 # at a time, resolving same-basename collisions instead of stacking duplicates.
 #
 #   sync_assets_tree <src_assets_dir> <dest_assets_dir> <policy>
 #
+# Top-level images are routed into <dest>/imgs/ on the way in (see
+# route_asset_relpath), so the post keeps the assets/imgs/ layout check_post.sh
+# expects no matter how the Obsidian vault was organized.
+#
 # A collision is an incoming file whose basename already exists in the post's
-# assets tree at a *different* relative path — e.g. Obsidian still ships
-# assets/foo.png while the repo has moved it to assets/imgs/foo.png. Landing on
-# the same relative path is an ordinary in-place update, not a collision.
+# assets tree at a *different* relative path — e.g. the repo keeps
+# assets/diagrams/foo.png while Obsidian ships foo.png, which routes to
+# assets/imgs/foo.png. Landing on the path a file already occupies is an ordinary
+# in-place update, not a collision, which is why routing a flat image onto the
+# post's existing assets/imgs/ copy needs no decision at all.
 #
 # Duplicate basenames are exactly what makes rewrite_obsidian_embeds give up on a
 # ![[foo.png]] embed (leaving an E1 for check_post.sh), so each one is resolved:
@@ -120,17 +176,48 @@ sync_assets_tree() {
     dest_label="$(basename "$dest")"
 
     local copied=0 identical=0 overridden=0 kept_existing=0 kept_both=0 failed=0
+    local routed=0
     local warned_no_tty=0
-    local rel base dest_path incoming_label matches match match_count
-    local existing existing_label effective choice is_new
+    local rel routed_rel base dest_path incoming_label matches match match_count
+    local existing existing_label effective choice is_new stale_path routed_onto_existing
 
     for asset in "${sources[@]}"; do
         rel="${asset#"$src"/}"
+        routed_rel="$(route_asset_relpath "$rel" "$src")"
         base="$(basename "$asset")"
-        dest_path="$dest/$rel"
-        incoming_label="$dest_label/$rel"
+        dest_path="$dest/$routed_rel"
+        incoming_label="$dest_label/$routed_rel"
+        # The duplicate to clean up once a collision resolves away from the incoming
+        # copy. Only the unrouted path can be one: a routed file's target is the
+        # post's canonical location, never something to delete.
+        stale_path="$dest_path"
+        routed_onto_existing=0
+
+        if [ "$routed_rel" != "$rel" ]; then
+            echo "📁 Routed '$rel' into '$incoming_label' (images belong under assets/imgs/)"
+            routed=$((routed + 1))
+            stale_path=""
+            # A copy at the unrouted path is this same file from a sync that predates
+            # routing; the routed copy supersedes it.
+            drop_stale_duplicate "$index" "$dest/$rel" "$dest_label/$rel"
+            if [ -f "$dest_path" ]; then
+                routed_onto_existing=1
+            fi
+        fi
 
         matches="$(lookup_indexed_assets "$index" "$base" "$dest_path")"
+
+        if [ -n "$matches" ] && [ "$routed_onto_existing" -eq 1 ]; then
+            # The canonical imgs/ copy already exists, so this is an in-place update;
+            # the other copies are strays that predate this sync. Overwriting or
+            # deleting one would be a guess, so update in place and report them.
+            echo "⚠️  '$base' also exists elsewhere in the post:"
+            while IFS= read -r match; do
+                printf '      - %s/%s\n' "$dest_label" "${match#"$dest"/}"
+            done <<< "$matches"
+            echo "      Updating '$incoming_label' in place and leaving those alone — the embed stays unresolved (E1). Resolve manually."
+            matches=""
+        fi
 
         if [ -z "$matches" ]; then
             is_new=0
@@ -152,7 +239,7 @@ sync_assets_tree() {
 
         if [ "$match_count" -eq 1 ] && cmp -s "$asset" "$existing"; then
             echo "↩️  '$base' is identical to '$existing_label' — keeping existing"
-            drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+            drop_stale_duplicate "$index" "$stale_path" "$incoming_label"
             identical=$((identical + 1))
             continue
         fi
@@ -209,7 +296,7 @@ sync_assets_tree() {
                 if cp "$asset" "$existing"; then
                     echo "✏️  Overrode '$existing_label' with the Obsidian version of '$base'"
                     overridden=$((overridden + 1))
-                    drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+                    drop_stale_duplicate "$index" "$stale_path" "$incoming_label"
                 else
                     echo "⚠️  Failed to override '$existing' with '$asset'"
                     failed=$((failed + 1))
@@ -218,7 +305,7 @@ sync_assets_tree() {
             keep-existing)
                 echo "🛡️  Kept the repo version of '$base' at '$existing_label'"
                 kept_existing=$((kept_existing + 1))
-                drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+                drop_stale_duplicate "$index" "$stale_path" "$incoming_label"
                 ;;
             keep-both)
                 is_new=0
@@ -238,7 +325,7 @@ sync_assets_tree() {
 
     rm -f "$index"
 
-    echo "ℹ️ Assets: $copied copied, $identical identical, $overridden overridden, $kept_existing kept-existing, $kept_both kept-both."
+    echo "ℹ️ Assets: $copied copied, $identical identical, $overridden overridden, $kept_existing kept-existing, $kept_both kept-both ($routed routed into imgs/)."
 
     [ "$failed" -eq 0 ]
 }
