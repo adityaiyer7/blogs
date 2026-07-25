@@ -43,7 +43,7 @@ The `--project` directory is the same shape as in project mode: exactly one top-
 
 **What the script does:**
 1. Overwrites `_draft.md` with the latest Obsidian draft.
-2. Re-mirrors the source `assets/` tree into the post's `assets/` folder.
+2. Re-mirrors the source `assets/` tree into the post's `assets/` folder, one file at a time, asking what to do whenever an incoming filename already exists elsewhere in the post (see [Asset name collisions](#asset-name-collisions)).
 3. Regenerates the **body** of `index.qmd` from the fresh draft, re-running the same Obsidian-embed rewriting and heading normalization as `create_post.sh`.
 4. Runs `check_post.sh <slug> --fix` to apply the safe, deterministic fixes (Obsidian ` ```mermaid ` blocks → Quarto ` ```{mermaid} `, `[!NOTE]`-style callouts → `::: {.callout-note}`, etc.) so the regenerated body is render-ready, not just re-imported.
 
@@ -51,7 +51,40 @@ The `--project` directory is the same shape as in project mode: exactly one top-
 - The existing YAML **frontmatter** in `index.qmd` (title, date, categories, …) is preserved untouched — it is repo-managed and is *not* re-derived from Obsidian. The `date:` field is not auto-bumped.
 - The post **body** is fully regenerated from the Obsidian source on every sync. Obsidian is the single source of truth for body content, so any manual edits made directly to the `index.qmd` body will be overwritten — make body changes in Obsidian, not in `index.qmd`.
 
-**Caveat:** the asset sync is additive (`cp -R`). Images removed in Obsidian are not deleted from the post's `assets/` folder; remove those manually if you want them gone.
+**Caveat:** the asset sync is additive. Images removed in Obsidian are not deleted from the post's `assets/` folder; remove those manually if you want them gone.
+
+#### Asset name collisions
+
+Embeds are resolved by *basename*, so the same filename living in two different folders inside a post makes `![[image.png]]` unresolvable — the embed is left as-is and `check_post.sh` reports it as a non-fixable `E1`. This happens easily: reorganize a post's images into `assets/imgs/`, then sync again from an Obsidian project that still keeps them flat, and you end up with both copies.
+
+The sync detects that case per file and resolves it instead of stacking duplicates:
+
+- **Identical files need no decision.** If the incoming file is byte-for-byte the same as the one already in the post, the existing copy wins silently and any leftover duplicate from an earlier sync is cleaned up.
+- **Otherwise you're asked**, once per collision:
+
+  ```
+  ⚠️  Asset name collision: 'diagram.png'
+        incoming (Obsidian): assets/diagram.png
+        existing (repo):     assets/imgs/diagram.png
+     a) Override      — write the Obsidian version into assets/imgs/diagram.png
+     b) Keep existing — discard the incoming copy
+     c) Keep both     — leaves the embed unresolved (E1) for manual fixup
+  Choose [a/b/c] (A/B/C applies to all remaining):
+  ```
+
+  Answering with a capital `A`, `B`, or `C` applies that choice to every remaining collision in the run.
+
+Note that **override writes into the *existing* path**, so a post whose images you moved into `assets/imgs/` keeps that layout (and stays clear of the `D2` warning) while still picking up the newer bytes from Obsidian.
+
+To skip the prompt — in a script, or to fix a whole reorganized post in one pass — pass a policy up front:
+
+```bash
+./sync_post.sh my-post-slug --project "/path/to/dir" --on-collision override
+```
+
+`--on-collision` accepts `ask` (the default), `override`, `keep-existing`, and `keep-both`. When there's no terminal to prompt on (piped input, CI), `ask` falls back to `keep-both` with a warning, which is the old additive behavior.
+
+Collisions the sync *can't* resolve are still reported rather than guessed at: if a basename already exists at more than one path inside the post, every copy is left in place for you to sort out by hand.
 
 #### Always render after syncing
 
