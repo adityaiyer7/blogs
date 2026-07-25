@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://adityaiyer7.github.io/blogs/index.html</loc>
-    <lastmod>2026-05-23T17:57:36.529Z</lastmod>
+    <lastmod>2026-07-25T07:00:07.644Z</lastmod>
   </url>
   <url>
     <loc>https://adityaiyer7.github.io/blogs/posts/sae-for-monosemanticity/index.html</loc>
@@ -23,5 +23,13 @@
   <url>
     <loc>https://adityaiyer7.github.io/blogs/posts/attention-mechanism/index.html</loc>
     <lastmod>2026-05-23T17:57:36.529Z</lastmod>
+  </url>
+  <url>
+    <loc>https://adityaiyer7.github.io/blogs/reading-group/index.html</loc>
+    <lastmod>2026-07-18T07:33:50.239Z</lastmod>
+  </url>
+  <url>
+    <loc>https://adityaiyer7.github.io/blogs/posts/v-jepa-walkthrough/index.html</loc>
+    <lastmod>2026-07-25T07:01:03.297Z</lastmod>
   </url>
 </urlset>
