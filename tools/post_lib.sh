@@ -22,6 +22,227 @@ normalize_markdown_for_quarto() {
     ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
 }
 
+# --- asset mirroring -------------------------------------------------------
+
+# Write a basename<TAB>path index of every file under $1 into the file at $2.
+index_assets() {
+    local root="$1"
+    local index_file="$2"
+    : > "$index_file"
+    local f
+    while IFS= read -r f; do
+        printf '%s\t%s\n' "$(basename "$f")" "$f" >> "$index_file"
+    done < <(find "$root" -type f ! -name '.gitkeep' | sort)
+}
+
+# Print the indexed paths whose basename is $2, excluding the path $3 (may be empty).
+# The comparison is an exact string match, so regex metacharacters in a filename
+# (., +, [ …) cannot cause a false hit.
+lookup_indexed_assets() {
+    awk -F'\t' -v base="$2" -v skip="$3" '$1 == base && $2 != skip { print $2 }' "$1"
+}
+
+index_asset_add() {
+    printf '%s\t%s\n' "$(basename "$2")" "$2" >> "$1"
+}
+
+index_asset_remove() {
+    awk -F'\t' -v path="$2" '$2 != path' "$1" > "$1.tmp" && mv "$1.tmp" "$1"
+}
+
+# Delete the duplicate an earlier additive sync left behind at $2 (the incoming
+# path), de-indexing it from the index file $1. $3 is the label to print.
+drop_stale_duplicate() {
+    local index_file="$1"
+    local dest_path="$2"
+    local label="$3"
+    [ -f "$dest_path" ] || return 0
+    rm -f "$dest_path"
+    index_asset_remove "$index_file" "$dest_path"
+    echo "   🧹 Removed the stale duplicate at '$label'"
+}
+
+# Mirror an Obsidian project's assets/ tree into a post's assets/ folder one file
+# at a time, resolving same-basename collisions instead of stacking duplicates.
+#
+#   sync_assets_tree <src_assets_dir> <dest_assets_dir> <policy>
+#
+# A collision is an incoming file whose basename already exists in the post's
+# assets tree at a *different* relative path — e.g. Obsidian still ships
+# assets/foo.png while the repo has moved it to assets/imgs/foo.png. Landing on
+# the same relative path is an ordinary in-place update, not a collision.
+#
+# Duplicate basenames are exactly what makes rewrite_obsidian_embeds give up on a
+# ![[foo.png]] embed (leaving an E1 for check_post.sh), so each one is resolved:
+#
+#   override       write the incoming version into the existing repo path,
+#                  keeping the repo's layout (images stay under assets/imgs/)
+#   keep-existing  discard the incoming copy, leave the repo file untouched
+#   keep-both      copy both and leave the embed ambiguous (the old behavior)
+#   ask            prompt per collision; A/B/C applies the answer to the rest
+#
+# Byte-identical collisions resolve to keep-existing without asking. Under `ask`
+# with no tty, collisions fall back to keep-both and say so. Under override and
+# keep-existing any stale duplicate a previous sync left at the incoming path is
+# removed, so an already-duplicated tree is cleaned up rather than just frozen.
+#
+# Like cp -R before it, this is additive: assets deleted in Obsidian are not
+# removed from the post.
+sync_assets_tree() {
+    local src="$1"
+    local dest="$2"
+    local policy="${3:-ask}"
+
+    [ -d "$src" ] || return 0
+    mkdir -p "$dest"
+
+    # Buffer the source walk into an array rather than piping it into the loop,
+    # so stdin stays free for the interactive prompt below.
+    local sources=()
+    local asset
+    while IFS= read -r asset; do
+        sources+=("$asset")
+    done < <(find "$src" -type f ! -name '.gitkeep' | sort)
+
+    if [ "${#sources[@]}" -eq 0 ]; then
+        echo "ℹ️ No asset files found in '$src'."
+        return 0
+    fi
+
+    local index
+    index="$(mktemp)"
+    index_assets "$dest" "$index"
+
+    local interactive=0
+    [ -t 0 ] && interactive=1
+
+    local dest_label
+    dest_label="$(basename "$dest")"
+
+    local copied=0 identical=0 overridden=0 kept_existing=0 kept_both=0 failed=0
+    local warned_no_tty=0
+    local rel base dest_path incoming_label matches match match_count
+    local existing existing_label effective choice is_new
+
+    for asset in "${sources[@]}"; do
+        rel="${asset#"$src"/}"
+        base="$(basename "$asset")"
+        dest_path="$dest/$rel"
+        incoming_label="$dest_label/$rel"
+
+        matches="$(lookup_indexed_assets "$index" "$base" "$dest_path")"
+
+        if [ -z "$matches" ]; then
+            is_new=0
+            [ -f "$dest_path" ] || is_new=1
+            mkdir -p "$(dirname "$dest_path")"
+            if cp "$asset" "$dest_path"; then
+                copied=$((copied + 1))
+                [ "$is_new" -eq 1 ] && index_asset_add "$index" "$dest_path"
+            else
+                echo "⚠️  Failed to copy '$asset' to '$dest_path'"
+                failed=$((failed + 1))
+            fi
+            continue
+        fi
+
+        match_count="$(printf '%s\n' "$matches" | wc -l | tr -d '[:space:]')"
+        existing="$(printf '%s\n' "$matches" | head -n 1)"
+        existing_label="$dest_label/${existing#"$dest"/}"
+
+        if [ "$match_count" -eq 1 ] && cmp -s "$asset" "$existing"; then
+            echo "↩️  '$base' is identical to '$existing_label' — keeping existing"
+            drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+            identical=$((identical + 1))
+            continue
+        fi
+
+        if [ "$match_count" -gt 1 ]; then
+            # The post's own tree is already ambiguous; picking a winner here would
+            # be a guess. Report it and leave the manual fixup to the author.
+            echo "⚠️  Asset name collision: '$base' already exists at several paths in the post:"
+            while IFS= read -r match; do
+                printf '      - %s/%s\n' "$dest_label" "${match#"$dest"/}"
+            done <<< "$matches"
+            echo "      Leaving every copy in place — the embed stays unresolved (E1). Resolve manually."
+            effective="keep-both"
+        else
+            effective="$policy"
+        fi
+
+        if [ "$effective" = "ask" ] && [ "$interactive" -eq 0 ]; then
+            if [ "$warned_no_tty" -eq 0 ]; then
+                echo "⚠️  Not running interactively — asset name collisions will keep both copies."
+                echo "      Re-run in a terminal, or pass --on-collision=override|keep-existing|keep-both."
+                warned_no_tty=1
+            fi
+            effective="keep-both"
+        fi
+
+        while [ "$effective" = "ask" ]; do
+            echo ""
+            echo "⚠️  Asset name collision: '$base'"
+            echo "      incoming (Obsidian): $incoming_label"
+            echo "      existing (repo):     $existing_label"
+            echo "   a) Override      — write the Obsidian version into $existing_label"
+            echo "   b) Keep existing — discard the incoming copy"
+            echo "   c) Keep both     — leaves the embed unresolved (E1) for manual fixup"
+            if ! read -r -p "Choose [a/b/c] (A/B/C applies to all remaining): " choice; then
+                echo ""
+                echo "   Input closed without an answer — keeping both copies."
+                effective="keep-both"
+                continue
+            fi
+            case "$choice" in
+                a) effective="override" ;;
+                b) effective="keep-existing" ;;
+                c) effective="keep-both" ;;
+                A) effective="override"; policy="override" ;;
+                B) effective="keep-existing"; policy="keep-existing" ;;
+                C) effective="keep-both"; policy="keep-both" ;;
+                *) echo "   Please answer a, b, or c (uppercase to apply to all remaining)." ;;
+            esac
+        done
+
+        case "$effective" in
+            override)
+                if cp "$asset" "$existing"; then
+                    echo "✏️  Overrode '$existing_label' with the Obsidian version of '$base'"
+                    overridden=$((overridden + 1))
+                    drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+                else
+                    echo "⚠️  Failed to override '$existing' with '$asset'"
+                    failed=$((failed + 1))
+                fi
+                ;;
+            keep-existing)
+                echo "🛡️  Kept the repo version of '$base' at '$existing_label'"
+                kept_existing=$((kept_existing + 1))
+                drop_stale_duplicate "$index" "$dest_path" "$incoming_label"
+                ;;
+            keep-both)
+                is_new=0
+                [ -f "$dest_path" ] || is_new=1
+                mkdir -p "$(dirname "$dest_path")"
+                if cp "$asset" "$dest_path"; then
+                    echo "⚠️  Kept both copies of '$base' — its ![[…]] embed will be left unresolved (E1)"
+                    kept_both=$((kept_both + 1))
+                    [ "$is_new" -eq 1 ] && index_asset_add "$index" "$dest_path"
+                else
+                    echo "⚠️  Failed to copy '$asset' to '$dest_path'"
+                    failed=$((failed + 1))
+                fi
+                ;;
+        esac
+    done
+
+    rm -f "$index"
+
+    echo "ℹ️ Assets: $copied copied, $identical identical, $overridden overridden, $kept_existing kept-existing, $kept_both kept-both."
+
+    [ "$failed" -eq 0 ]
+}
+
 # Rewrite Obsidian image embeds (![[file.png]] / ![[file.png|caption]]) into Quarto
 # markdown image links (![](assets/<relpath>) / ![caption](assets/<relpath>)). The
 # relative path is resolved from a basename->path map built over the post's copied

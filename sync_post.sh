@@ -5,20 +5,30 @@
 # preserved. Rendering is not run — use `quarto preview` or push to let CI render.
 #
 #   ./sync_post.sh <slug> --project /path/to/obsidian-project-dir
+#                         [--on-collision ask|override|keep-existing|keep-both]
 #
 # The project dir must contain exactly one top-level .md file (the draft) and,
 # optionally, an assets/ folder. This overwrites _draft.md and regenerates the
 # body of index.qmd, re-running the same Obsidian-embed rewrite and heading
 # normalization as create_post.sh.
+#
+# The assets mirror is per-file: when an incoming file's name already exists in
+# the post at a different path (e.g. Obsidian ships assets/foo.png but the repo
+# moved it to assets/imgs/foo.png), --on-collision decides what happens. The
+# default, `ask`, prompts for each collision — identical files need no prompt.
 
 # navigate to the directory where this script resides, so we always work relative to blogs/
 cd "$(dirname "$0")"
 
-# Shared helpers: normalize_markdown_for_quarto, rewrite_obsidian_embeds, extract_frontmatter.
+# Shared helpers: sync_assets_tree, normalize_markdown_for_quarto,
+# rewrite_obsidian_embeds, extract_frontmatter.
 source tools/post_lib.sh
 
-# Parse arguments: a `--project <dir>` flag plus the positional post slug.
+# Parse arguments: `--project <dir>` and `--on-collision <mode>` flags plus the
+# positional post slug.
+USAGE="Usage: ./sync_post.sh <slug> --project /path/to/obsidian-project-dir [--on-collision ask|override|keep-existing|keep-both]"
 PROJECT_DIR=""
+ON_COLLISION="ask"
 POSITIONAL=()
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -29,6 +39,21 @@ while [ $# -gt 0 ]; do
         --project=*)
             PROJECT_DIR="${1#*=}"
             shift
+            ;;
+        --on-collision)
+            ON_COLLISION="$2"
+            shift 2
+            ;;
+        --on-collision=*)
+            ON_COLLISION="${1#*=}"
+            shift
+            ;;
+        --*)
+            # Without this, a typo'd flag would fall through to POSITIONAL and be
+            # reported as an invalid post slug.
+            echo "Error: Unknown option '$1'."
+            echo "$USAGE"
+            exit 1
             ;;
         *)
             POSITIONAL+=("$1")
@@ -41,9 +66,17 @@ set -- "${POSITIONAL[@]}"
 POST_SLUG="$1"
 
 if [ -z "$POST_SLUG" ]; then
-    echo "Usage: ./sync_post.sh <slug> --project /path/to/obsidian-project-dir"
+    echo "$USAGE"
     exit 1
 fi
+
+case "$ON_COLLISION" in
+    ask|override|keep-existing|keep-both) ;;
+    *)
+        echo "Error: Invalid --on-collision value '$ON_COLLISION'. Expected one of: ask, override, keep-existing, keep-both."
+        exit 1
+        ;;
+esac
 
 if [[ ! "$POST_SLUG" =~ ^[a-zA-Z0-9_-]+$ ]]; then
     echo "Error: Invalid post slug. Only alphanumeric characters, dashes, and underscores are allowed."
@@ -106,10 +139,11 @@ MD_DRAFT="${MD_MATCHES[0]}"
 cp "$MD_DRAFT" "$TARGET_DIR/_draft.md"
 echo "✅ Synced '$MD_DRAFT' to '$TARGET_DIR/_draft.md'"
 
-# Mirror the source assets/ tree additively (preserving subfolders). Note: this
-# does not delete repo assets that were removed in Obsidian.
+# Mirror the source assets/ tree additively (preserving subfolders), resolving
+# same-basename collisions per --on-collision. Note: this does not delete repo
+# assets that were removed in Obsidian.
 if [ -d "$PROJECT_DIR/assets" ]; then
-    cp -R "$PROJECT_DIR/assets/." "$TARGET_DIR/assets/"
+    sync_assets_tree "$PROJECT_DIR/assets" "$TARGET_DIR/assets" "$ON_COLLISION"
     echo "✅ Synced assets from '$PROJECT_DIR/assets' to '$TARGET_DIR/assets'"
 else
     echo "⚠️ Warning: No 'assets' folder found in '$PROJECT_DIR'. Skipping asset sync."
