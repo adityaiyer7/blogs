@@ -3,7 +3,7 @@
 # navigate to the directory where this script resides, so we always work relative to blogs/
 cd "$(dirname "$0")"
 
-# Shared helpers: normalize_markdown_for_quarto, rewrite_obsidian_embeds.
+# Shared helpers: sync_assets_tree, normalize_markdown_for_quarto, rewrite_obsidian_embeds.
 source tools/post_lib.sh
 
 # Parse arguments: a `--project <dir>` flag (project mode) plus positional
@@ -87,10 +87,13 @@ fi
 mkdir -p "$ASSETS_DIR"
 touch "$ASSETS_DIR/.gitkeep"
 
-# In project mode, mirror the source assets/ tree (preserving subfolders) into the post.
+# In project mode, mirror the source assets/ tree into the post, routing top-level
+# images into assets/imgs/ so a new post starts out on the repo's layout. The
+# destination is a folder we just created, so no collision can arise — the policy
+# only matters as a non-interactive default.
 if [ -n "$PROJECT_DIR" ]; then
     if [ -d "$PROJECT_DIR/assets" ]; then
-        cp -R "$PROJECT_DIR/assets/." "$TARGET_DIR/assets/"
+        sync_assets_tree "$PROJECT_DIR/assets" "$TARGET_DIR/assets" keep-both
         echo "✅ Copied assets from '$PROJECT_DIR/assets' to '$TARGET_DIR/assets'"
     else
         echo "⚠️ Warning: No 'assets' folder found in '$PROJECT_DIR'. Skipping asset copy."
