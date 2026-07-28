@@ -50,11 +50,47 @@ def _(base64, html, mo, sys):
 
 @app.cell
 def _(mo):
+    query_params = mo.query_params()
+    artifact = query_params.get("artifact", "all")
+
+    def _float_param(name, default):
+        try:
+            return float(query_params.get(name, default))
+        except (TypeError, ValueError):
+            return default
+
+    def _int_param(name, default):
+        try:
+            return int(query_params.get(name, default))
+        except (TypeError, ValueError):
+            return default
+
+    initial_area_fraction = _float_param("area", 0.50)
+    initial_aspect_ratio = _float_param("aspect", 1.00)
+    initial_sample_position = _int_param("position", 0)
+    return (
+        artifact,
+        initial_area_fraction,
+        initial_aspect_ratio,
+        initial_sample_position,
+        query_params,
+    )
+
+
+@app.cell
+def _(
+    initial_area_fraction,
+    initial_aspect_ratio,
+    initial_sample_position,
+    mo,
+    query_params,
+):
     area_fraction = mo.ui.slider(
         start=0.30,
         stop=1.00,
         step=0.01,
-        value=0.50,
+        value=initial_area_fraction,
+        on_change=lambda value: query_params.set("area", f"{value:.2f}"),
         debounce=True,
         show_value=True,
         include_input=True,
@@ -65,7 +101,8 @@ def _(mo):
         start=0.75,
         stop=4 / 3,
         step=0.01,
-        value=1.00,
+        value=initial_aspect_ratio,
+        on_change=lambda value: query_params.set("aspect", f"{value:.2f}"),
         debounce=True,
         show_value=True,
         include_input=True,
@@ -73,8 +110,11 @@ def _(mo):
         full_width=True,
     )
     sample_position = mo.ui.button(
-        value=0,
-        on_click=lambda draw: draw + 1,
+        value=initial_sample_position,
+        on_click=lambda draw: (
+            query_params.set("position", str(draw + 1)),
+            draw + 1,
+        )[1],
         label="New position",
         kind="neutral",
         full_width=True,
@@ -130,6 +170,7 @@ def _(
 def _(
     IMAGE_HEIGHT,
     IMAGE_WIDTH,
+    artifact,
     area_fraction,
     aspect_ratio,
     crop,
@@ -137,6 +178,8 @@ def _(
     mo,
     sample_position,
 ):
+    mo.stop(artifact not in ("all", "crop"))
+
     if crop["valid"]:
         _overlay = f"""
           <svg class="ij-crop-overlay" viewBox="0 0 {IMAGE_WIDTH} {IMAGE_HEIGHT}" aria-hidden="true">
@@ -369,7 +412,9 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(IMAGE_HEIGHT, IMAGE_WIDTH, OUTPUT_SIZE, crop, image_src, mo):
+def _(IMAGE_HEIGHT, IMAGE_WIDTH, OUTPUT_SIZE, artifact, crop, image_src, mo):
+    mo.stop(artifact not in ("all", "resize"))
+
     if crop["valid"]:
         _resize_content = f"""
           <svg class="ij-image-defs" aria-hidden="true">
@@ -608,7 +653,9 @@ def _(IMAGE_HEIGHT, IMAGE_WIDTH, OUTPUT_SIZE, crop, image_src, mo):
 
 
 @app.cell(hide_code=True)
-def _(IMAGE_HEIGHT, IMAGE_WIDTH, OUTPUT_SIZE, crop, image_src, mo):
+def _(IMAGE_HEIGHT, IMAGE_WIDTH, OUTPUT_SIZE, artifact, crop, image_src, mo):
+    mo.stop(artifact not in ("all", "patches"))
+
     PATCH_SIZE = 14
     GRID_SIZE = OUTPUT_SIZE // PATCH_SIZE
 
@@ -999,6 +1046,7 @@ def _(
 def _(
     IMAGE_HEIGHT,
     IMAGE_WIDTH,
+    artifact,
     crop,
     context_area_fraction,
     image_src,
@@ -1008,6 +1056,8 @@ def _(
     target_area_fraction,
     target_aspect_ratio,
 ):
+    mo.stop(artifact not in ("all", "masks"))
+
     _patch_size = 14
     _grid_size = mask_sample["grid_size"]
     _output_size = _patch_size * _grid_size
