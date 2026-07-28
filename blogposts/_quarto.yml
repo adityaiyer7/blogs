@@ -1,17 +1,19 @@
 project:
   type: website
   output-dir: docs
+  # Estimated reading time. Quarto computes its own value for listing cards
+  # only; this script discards it and recomputes one count per post from the
+  # rendered HTML, then writes it to the post page, the listing card, and the
+  # search index so all three agree (see tools/reading_time/).
+  post-render:
+    - ../update_reading_time.sh
 
 metadata-files:
   - _links.yml
 
-# Estimated reading time. Native to Quarto listings only; this filter also
-# surfaces it on individual post pages (see filters/reading-time.lua).
-filters:
-  - filters/reading-time.lua
-
-# Render the native listing reading-time string as "N min read" (default is
-# "N min") so listing cards and post pages read identically.
+# Shape of the listing card's reading-time string (default is "N min"). The
+# post-render script overwrites the number, but keeping the field means Quarto
+# renders the slot for it to patch.
 language:
   listing-page-minutes-compact: "{0} min read"
 

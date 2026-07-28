@@ -101,8 +101,8 @@ body {
   margin-top: 1rem;
 }
 
-/* Estimated reading time, injected into the post header by
-   filters/reading-time.lua. Sits just beneath the title-meta / date. */
+/* Estimated reading time, injected into the post header after every render by
+   update_reading_time.sh. Sits just beneath the title-meta / date. */
 .reading-time {
   font-family: var(--ui-font);
   font-size: 0.8rem;

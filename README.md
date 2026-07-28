@@ -166,6 +166,26 @@ Some content.
 
 The checker is a standalone Python tool under `tools/qmd_lint/` (run via `uv`); its rules can be tuned in `tools/qmd_lint/config.py`. Run its tests with `uv run pytest`.
 
+## Reading Time
+
+Every dated post shows an estimated reading time in two places — a precise figure on the post's own page (`15.9 min read`) and a coarse one on the homepage listing card, rounded to the nearest 5 minutes and floored at 5 (`15 min read`). Both are derived from **one** word count per post, so the two surfaces can never disagree the way they used to when Quarto counted for the listing and a Pandoc filter counted for the post page.
+
+The count is taken from the *rendered* HTML at 200 words per minute:
+
+- **Prose and code** are counted as words. Code counts fully even though `code-fold: true` collapses it on load.
+- **Math is not counted from its source.** MathJax typesets in the browser, so the rendered page still contains raw LaTeX; tallying it made equation-heavy posts read far longer than they are. Instead each display equation is credited a flat 8 words and each inline span 1 word.
+- Titles, descriptions, dates, the table of contents, and scripts are excluded.
+
+You do not need to run anything: `blogposts/_quarto.yml` invokes the script after every `quarto render` and `quarto preview` (including CI publishes and single-post renders), patching the post page, the homepage card, and the search index in place. To re-run it by hand against the current contents of `blogposts/docs/`:
+
+```bash
+./update_reading_time.sh                 # every rendered post
+./update_reading_time.sh my-post-slug    # one post
+./update_reading_time.sh --check         # report drift, change nothing (CI-friendly)
+```
+
+It reads rendered output rather than tracking state, so it is safe to re-run at any time. Posts that have never been rendered, and pages without a front-matter `date` (About, Reading Group), are skipped. The tool lives under `tools/reading_time/`; its tests run with `uv run pytest`.
+
 ## Previewing and Publishing
 
 To see a live, auto-updating preview of your blog locally while you write:
