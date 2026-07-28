@@ -19,6 +19,7 @@ We expect to continue beyond the papers currently listed below -- this is simply
 1. [Reading Group Calendar](https://luma.com/calendar/cal-Ug3DM2lZycfcd8U)
 2. [Presenter Form](https://forms.gle/wpi5tJbi8CrKikEi8?utm_source=luma) (fill this out if you're interested in presenting)
 3. [Paper Suggestion Form](https://forms.gle/cfK2fPTtWNP8Gw9a6?utm_source=luma)
+4. [Mechanistic Interpretability Glossary](../posts/mechanistic-interpretability-glossary/)
 
 # Schedule
 
