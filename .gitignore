@@ -29,3 +29,9 @@ __pycache__/
 # Add any specialized exclusions here
 /.quarto/
 **/*.quarto_ipynb
+
+# Marimo WebAssembly bundles are regenerated locally and in CI.
+blogposts/posts/*/interactive/*/dist/
+blogposts/docs/posts/*/interactive/*/dist/
+# Quarto copies this shared app resource into generated site output.
+blogposts/docs/posts/v-jepa-walkthrough/assets/cat.png

@@ -6,6 +6,9 @@ categories: [Deep-Learning]
 toc: true
 inline-citations: true
 bibliography: references.bib
+resources:
+  - interactive/i-jepa/dist/**
+  - assets/cat.png
 ---
 
 # How to Read this Blog
@@ -98,7 +101,89 @@ $$
 \right].
 $$
 
-Finally, the crop is resized to $224 \times 224$. In the standard ViT-H/14 configuration, the image is then divided into non-overlapping $14 \times 14$ patches, producing $256$ patches arranged as a $16 \times 16$ grid. Each patch is projected into a token representation.
+Use the controls below to see how the area fraction and aspect ratio determine a valid crop, and resample its position within the source image.
+
+<iframe
+  id="ijepa-crop-artifact"
+  src="interactive/i-jepa/dist/index.html?embed=true&amp;artifact=crop"
+  title="Interactively sample an I-JEPA crop from the source image"
+  loading="lazy"
+  sandbox="allow-scripts allow-same-origin"
+  width="100%"
+  height="850"
+  style="border: 1px solid #d7d9dc; border-radius: 8px;"
+></iframe>
+
+<script>
+(() => {
+  const cropFrame = document.getElementById("ijepa-crop-artifact");
+  if (!cropFrame) return;
+
+  const defaults = {area: "0.50", aspect: "1.00", position: "0"};
+  let lastState = "";
+
+  const syncCropState = () => {
+    try {
+      const cropUrl = new URL(cropFrame.contentWindow.location.href);
+      const state = Object.fromEntries(
+        Object.entries(defaults).map(([key, fallback]) => [
+          key,
+          cropUrl.searchParams.get(key) ?? fallback,
+        ])
+      );
+      const stateKey = JSON.stringify(state);
+      if (stateKey === lastState) return;
+
+      document.querySelectorAll(".ijepa-derived-artifact").forEach((frame) => {
+        const url = new URL(frame.getAttribute("src"), window.location.href);
+        Object.entries(state).forEach(([key, value]) => {
+          url.searchParams.set(key, value);
+        });
+        frame.src = url.toString();
+      });
+      lastState = stateKey;
+    } catch {
+      // The frame may not be ready yet; the next interval will retry.
+    }
+  };
+
+  cropFrame.addEventListener("load", syncCropState);
+  const syncTimer = window.setInterval(syncCropState, 400);
+  window.addEventListener(
+    "pagehide",
+    () => window.clearInterval(syncTimer),
+    {once: true}
+  );
+})();
+</script>
+
+Finally, the crop is resized to $224 \times 224$.
+
+<iframe
+  class="ijepa-derived-artifact"
+  data-artifact="resize"
+  src="interactive/i-jepa/dist/index.html?embed=true&amp;artifact=resize"
+  title="Visualize an I-JEPA crop being resized to 224 by 224 pixels"
+  loading="lazy"
+  sandbox="allow-scripts allow-same-origin"
+  width="100%"
+  height="560"
+  style="border: 1px solid #d7d9dc; border-radius: 8px;"
+></iframe>
+
+In the standard ViT-H/14 configuration, the image is then divided into non-overlapping $14 \times 14$ patches, producing $256$ patches arranged as a $16 \times 16$ grid. Each patch is projected into a token representation.
+
+<iframe
+  class="ijepa-derived-artifact"
+  data-artifact="patches"
+  src="interactive/i-jepa/dist/index.html?embed=true&amp;artifact=patches"
+  title="Visualize the resized I-JEPA image as a 16 by 16 patch grid"
+  loading="lazy"
+  sandbox="allow-scripts allow-same-origin"
+  width="100%"
+  height="620"
+  style="border: 1px solid #d7d9dc; border-radius: 8px;"
+></iframe>
 
 I-JEPA must now determine which token positions will provide context and which will serve as prediction targets. Rather than selecting individual target tokens at random, it selects contiguous rectangular regions, called **target blocks**, on the $16 \times 16$ token grid.
 
@@ -107,6 +192,18 @@ The standard configuration uses four target blocks. I-JEPA samples a target-bloc
 Because the target-block locations are sampled separately, the four blocks may overlap. Consequently, the same token position can appear in more than one target block. Thus, "four targets" refers to four rectangular groups of patch tokens, not four individual patches.
 
 The context region is sampled as a separate, much larger block, covering 85–100% of the grid. Any positions that overlap with the target blocks are removed from the context. The resulting context is therefore not necessarily the complement of the targets, and some tokens may be used by neither branch. Removing the overlapping positions ensures that the context encoder cannot directly observe the tokens it is being asked to predict.
+
+<iframe
+  class="ijepa-derived-artifact"
+  data-artifact="masks"
+  src="interactive/i-jepa/dist/index.html?embed=true&amp;artifact=masks"
+  title="Interactively sample I-JEPA target blocks and retained context"
+  loading="lazy"
+  sandbox="allow-scripts allow-same-origin"
+  width="100%"
+  height="850"
+  style="border: 1px solid #d7d9dc; border-radius: 8px;"
+></iframe>
 
 Before the transformer layers process the tokens, fixed two-dimensional sine-cosine positional embeddings are added. These embeddings identify where each token originated on the $16 \times 16$ grid.
 
