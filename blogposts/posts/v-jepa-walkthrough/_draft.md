@@ -28,7 +28,8 @@ Before diving into JEPA, let's take a brief look at Vision Masked Autoencoders (
 
 
 
-This is exactly the SSL paradigm we've been discussing. Note here that the blue squares represent the context (clean input) and the grey squares represent the masked/corrupted input. The model uses the blue squares to predict the grey squares. However, JEPA's core argument is that predicting at the pixel level is wasteful, because the model has to allocate resources to predict low level details like texture and noise that may not necessarily be semantically relevant. Instead, JEPA proposes that we make our prediction in the latent space. To see how this works in practice, continue to the next section. 
+This is exactly the SSL paradigm we've been discussing. Reading the figure left to right: in the input, the grey squares are the masked-out patches, and the remaining visible patches are the context. Only those visible patches go into the encoder, which produces the cyan column; these are latent representations, not pixels. The grey squares that reappear alongside them are the decoder's mask tokens, placeholders standing in for the positions to be filled. The decoder consumes both and produces the pixel reconstruction on the right.
+
 
 # I-JEPA (Image JEPA)
 
@@ -37,9 +38,9 @@ This is exactly the SSL paradigm we've been discussing. Note here that the blue 
 
 ## Architecture Overview
 
-In the previous section we briefly saw how MAE reconstructs the pixels and that JEPA proposes making predictions in the latent space instead of reconstructing the pixels. Architecturally, I-JEPA, would look something like this:
+In the previous section we briefly saw how MAE reconstructs the pixels and that JEPA proposes making predictions in the latent space instead of reconstructing the pixels. Architecturally, I-JEPA would look something like this:
 
-![[I-JEPA_architecture.png]]
+![[Foundational ML/Deep Learning/JEPA/assets/I-JEPA_architecture.png]]
 
 There are three main parts to the JEPA architecture: context encoder, target encoder and predictor network. The context encoder takes the unmasked part of image and converts it into a context embedding $c$ . The target encode gets the whole image and converts it to a target embedding $t$ (more on this later). The predictor network then takes $(c,p)$ as input where $c$ is the context embedding, and $p$ represents the position of the masked tokens to be predicted and outputs $\hat{t}$. The loss is then calculated with respect to $t, \hat{t}$. 
 
@@ -91,25 +92,25 @@ Finally, the crop is resized to $224 \times 224$. In the standard ViT-H/14 confi
 
 I-JEPA must now determine which token positions will provide context and which will serve as prediction targets. Rather than selecting individual target tokens at random, it selects contiguous rectangular regions, called **target blocks**, on the $16 \times 16$ token grid.
 
-The standard configuration uses four target blocks. I-JEPA samples a target-block area and aspect ratio and uses them to calculate the block's height and width in grid cells. In this implementation, the resulting block size is shared by all four target blocks, while each block is assigned a separately sampled location. Every token inside a target rectangle becomes a prediction target. You might notice that this procedure feels familiar. Sampling the target and context blocks is really the same trick we used earlier when cropping the input image: we choose how much area the region should cover, choose an aspect ratio that fixes its shape, use those to work out a concrete rectangle, and then place that rectangle at a random location. The only thing that has changed is where we apply the idea. Earlier it operated on the raw image in pixel space; here the very same recipe runs on the $16 \times 16$ grid of patch tokens instead, once to lay down the target blocks and once to lay down the context block.
+The standard configuration uses four target blocks. I-JEPA samples a target-block area and aspect ratio and uses them to calculate the block's height and width in grid cells. > In this implementation, the resulting block size is shared by all four target blocks — and in fact by every image in the batch, since the size is drawn once per training iteration from a seeded generator. Only the locations vary: each block in each image gets its own. Every token inside a target rectangle becomes a prediction target. You might notice that this procedure feels familiar. Sampling the target and context blocks is really the same trick we used earlier when cropping the input image: we choose how much area the region should cover, choose an aspect ratio that fixes its shape, use those to work out a concrete rectangle, and then place that rectangle at a random location. The only thing that has changed is where we apply the idea. Earlier it operated on the raw image in pixel space; here the very same recipe runs on the $16 \times 16$ grid of patch tokens instead, once to lay down the target blocks and once to lay down the context block.
 
 Because the target-block locations are sampled separately, the four blocks may overlap. Consequently, the same token position can appear in more than one target block. Thus, "four targets" refers to four rectangular groups of patch tokens, not four individual patches.
 
-The context region is sampled as a separate, much larger block. Any positions that overlap with the target blocks are removed from the context. The resulting context is therefore not necessarily the complement of the targets, and some tokens may be used by neither branch. Removing the overlapping positions ensures that the context encoder cannot directly observe the tokens it is being asked to predict.
+The context region is sampled as a separate, much larger block, covering 85–100% of the grid. Any positions that overlap with the target blocks are removed from the context. The resulting context is therefore not necessarily the complement of the targets, and some tokens may be used by neither branch. Removing the overlapping positions ensures that the context encoder cannot directly observe the tokens it is being asked to predict.
 
 Before the transformer layers process the tokens, fixed two-dimensional sine-cosine positional embeddings are added. These embeddings identify where each token originated on the $16 \times 16$ grid.
 
-The target and context branches then operate differently. The target encoder processes the complete grid of $256$ positioned tokens. Only after the full target-encoder forward pass are the representations at the target locations selected. In contrast, the context encoder processes only the positioned context tokens.
+The target and context branches then operate differently. The target encoder processes the complete grid of $256$ positioned tokens. Only after the full target-encoder forward pass are the representations layer-normalized over the feature dimension, and the representations at the target locations selected. In contrast, the context encoder processes only the positioned context tokens. That layer-norm is a small line of code with outsized importance. It strips the target of any freely chosen scale or offset, which removes one of the easiest routes to a trivial solution. It comes up again in the appendix.
 
 The predictor receives the encoded context representations together with learned placeholder tokens for the target positions. Each placeholder consists of a shared learned mask token combined with a positional embedding identifying the location it represents. Since one placeholder is provided for every token position in a target block, the complete set of placeholders communicates both the location and shape of the region to be predicted.
 
-Using the context representations and positional placeholders, the predictor produces one representation for each target position. These predictions are then compared with the corresponding representations produced by the target encoder. The comparison is done via the L1 huber loss (the huber loss is a smoother version of the regular L1 loss). 
+Using the context representations and positional placeholders, the predictor produces one representation for each target position. These predictions are then compared with the corresponding representations produced by the target encoder. The comparison is done via a smooth L1 loss, also known as the Huber loss: it behaves like L2 for small errors and like L1 for large ones, which keeps it differentiable at zero while staying robust to outliers.  
 
 Now, keen readers might be be wondering, what's stopping the model from assigning each masked patch, the same input? Essentially, you're asking the model to create a representation in a high-dimensional space, and then predict that representation (in a way it's like asking a student to write their own questions for an exam and then answer them). If we trained the entire model using backpropagation, this is exactly what would happen. The target encoder would map all the patches to the same point in the embedding space, and then the predictor network would just predict that point, obtaining a loss of zero, but learning nothing useful. That is a serious possibility with self-supervised learning and is a problem called representational collapse, which will be discussed in more detail in the appendix to avoid deviating from the main focus of the blog. Interested readers are encouraged to read that section. 
 
 ## Inference 
 
-Inference is conceptually a lot simpler. We pass in an image of any size ) - we make it a 224 by 224 image using the same preprocessing steps mentioned earlier. Once we have this resized image, we have 256 patch tokens that gets sent into the target encoder. We then use these encoded representations for downstream tasks. We no longer need the context encoder and predictor network during inference. 
+Inference is conceptually a lot simpler. We pass in an image of any size; we make it a 224 by 224 image using the same preprocessing steps mentioned earlier. Once we have this resized image, we have 256 patch tokens that get sent into the target encoder. Note this differs from training, which used a _random_ resized crop; at inference, we want a single deterministic view, not a sample from a distribution of crops. (The I-JEPA repository ships pretraining code only, so this describes standard practice for evaluating the released checkpoints rather than code in the repo.) We then use these encoded representations for downstream tasks. We no longer need the context encoder and predictor network during inference. 
 
 
 
@@ -142,31 +143,22 @@ Now that we've formed our sample, we need to form our input to the model. The in
 Visually, w e can represent a tubelet like this:
 ![[tubelet.png]]
 
-Now, we flatten this tubelet, and pass it through a linear projection to create our input vector. As of now this has no positional representation, so we add a positional encoding here so the model has positional information. The positional encoding is obtained from a fixed sinusodal scheme and is not learned. The positional encoding scheme is as follows:
+Now, we flatten this tubelet and pass it through a linear projection to create our input vector. As of now, this has no positional representation.
 
-$$\omega_k = \frac{1}{10000^{\,2k/D}}, \quad k = 0, 1, \dots, \tfrac{D}{2}-1$$
+In the original V-JEPA, this is where a fixed sinusoidal positional encoding would get added directly to the token embedding. V-JEPA 2's released models don't do this; instead, they use **RoPE (Rotary Position Embeddings)**. Rather than encoding position once, additively, at the embedding stage, RoPE injects positional information inside every attention layer by rotating the query and key vectors according to each token's (time, height, width) coordinates. We won't get into the mechanics of RoPE here since that's not the focus of this post; the important point for this walkthrough is just _where_ position enters the model: not as a vector added to the input, but as an operation applied inside attention, at every layer.
 
-$$\text{PE}(p) = \left[\sin(p\,\omega_0), \dots, \sin(p\,\omega_{D/2-1}),\; \cos(p\,\omega_0), \dots, \cos(p\,\omega_{D/2-1})\right]$$
-Here D is the per axis dimension count (i.e. how many dimensions are allotted to encode one axis's position). Specifically, the V-JEPA repo sets these values for the corresponding dimesnions:
-
-| Axis   | D   | Frequencies (D/2) | sin + cos | Output width |
-| ------ | --- | ----------------- | --------- | ------------ |
-| Time   | 512 | 256               | 256 + 256 | 512          |
-| Height | 256 | 128               | 128 + 128 | 256          |
-| Width  | 256 | 128               | 128 + 128 | 256          |
-
-**Total:** 512 + 256 + 256 = 1024 = token width (ViT-L)
+If you're interested in learning more about RoPE, here's a video I found helpful. {citation:RoPE}
 
 Now we have 2048 tokens, with positional information encoded. 
 
-Now that we have all the positions encoded, we're ready to create our target and context patches. In order to do that, we take random spatial patches and form tubes that span over the temporal frames (the temporal frame depth is something that we configure, but the shipped V-JEPA 2 implementation spans all 8 frames). The image here should make this clearer:
+Now that we have all the positions encoded, we're ready to create our target and context patches. In order to do that, we take random spatial patches and form tubes that span over the temporal frames (the temporal frame depth is something that we configure, but the shipped V-JEPA 2 implementation spans all 8 tubelets). The image here should make this clearer:
 
 ![[tube.png]]
 
-To form the target patches, we set a configurable parameter representing the number of **blocks** we form (the shipped V-JEPA implementation sets this to 8). To form each block's spatial extent, we use a strategy similar to I-JEPA,  starting from an area and an aspect ratio and combine it with a sampled temporal extent, giving a 3D tube. To avoid confusion, note that the tubelet extends across frames, but the tubes extend across the tubelets. We stamp several such tubes at random positions; their union is the target region, and everything not masked out serves as context (V-JEPA actually applies two such masks per sample one with many small tubes, one with a few large ones but the smaller ones are omitted from this post as an intentional simplification). Essentially, the context is the complement of the union of the mask. 
+To form the target patches, we set a configurable parameter representing the number of **blocks** we form (the shipped V-JEPA implementation sets this to 8). To form each block's spatial extent, we use a strategy similar to I-JEPA,  starting from an area and an aspect ratio and combining it with a sampled temporal extent, giving a 3D tube. To avoid confusion, note that the tubelet extends across frames, but the tubes extend across the tubelets. We stamp several such tubes at random positions; their union is the target region, and everything not masked out serves as context (V-JEPA 2 actually applies two such masks per sample: one with 8 small tubes covering roughly 15% of the spatial grid each, and one with 2 large tubes covering roughly 70% each). Essentially, the context is the complement of the union of the mask. 
 
-From here, the process is similar to I-JEPA and the effort we put in earlier, finally pays of here. 
-For a quick summary, target encoder sees all the tokens; context encoder only sees the context tokens and the predictor network then takes the context encoder output along with positons — just as in I-JEPA, each target position is supplied to the predictor as a learned placeholder: a single shared mask token combined with that position's positional embedding — and then predicts the target and the prediction is compared with the output of the target encoder. The comparison is done via the L1 loss. Note this comparison happens in representation space, not pixel space, which is the latent-prediction idea from earlier made concrete. Note that the target encoder isn't a separate network, it's a slowly-moving copy of the context encoder (updated as a running average of its weights rather than by gradients). The mechanics of this update, and why it's what prevents representational collapse, are in the appendix.
+From here, the process is similar to I-JEPA, and the effort we put in earlier finally pays off here. 
+For a quick summary, the target encoder sees all tokens; the context encoder only sees the context tokens; and the predictor network then takes the context encoder output along with positions and predicts the target, which is compared with the output of the target encoder. As in I-JEPA, each target position is supplied to the predictor as a learned placeholder token, but two details differ. V-JEPA 2's predictor holds a separate mask token for each mask configuration — two of them, matching the two masks above — rather than one shared token. And because the model uses rotary position embeddings, the placeholder carries no added positional embedding; its position enters through the rotation applied inside attention.The comparison is done via the L1 loss. Note this comparison happens in representation space, not pixel space, which is the latent-prediction idea from earlier made concrete. Note that the target encoder isn't a separate network, it's a slowly-moving copy of the context encoder (updated as a running average of its weights rather than by gradients). The mechanics of this update, and why it's what prevents representational collapse, are in the appendix.
 
 ## Inference
 
@@ -174,12 +166,7 @@ The learnings from I-JEPA also carry forward here during inference. The predicto
 
 # Sources
 - {masked_auto_encoder}: [Masked Auto Encoders Are Scalable Vision Learners] (https://arxiv.org/pdf/2111.06377)
-
-
-# CITATION RULES
-Inline Citation, use tags:
-
-{citation:toymodels}, then in the end 
+- {RoPE}: [RoPE: Understanding Rotary Positional Embeddings in transformers] (https://www.youtube.com/watch?v=jlGf2qieSk0&t=658s)
 
 # Appendix 
 

@@ -180,6 +180,23 @@ def test_routed_flat_image_resolves_its_embed_under_imgs(tmp_path):
     assert rewrite(qmd, post) == "Body\n\n![A tube](assets/imgs/tube.png)\n"
 
 
+def test_path_qualified_embed_resolves_by_basename(tmp_path):
+    """Obsidian disambiguates a same-named file elsewhere in the vault by embedding
+    its full vault-relative path instead of the bare basename. The asset map is
+    keyed by basename, so the lookup must fall back to the embed's own basename."""
+    post = tmp_path / "post"
+    src = tmp_path / "project" / "assets"
+    write(src / "diagram.png", "OBSIDIAN")
+    qmd = write(
+        post / "index.qmd",
+        "Body\n\n![[Some Vault/Deep Learning/JEPA/assets/diagram.png]]\n",
+    )
+
+    assert sync(src, post / "assets", "ask").returncode == 0
+
+    assert rewrite(qmd, post) == "Body\n\n![](assets/imgs/diagram.png)\n"
+
+
 def test_same_relpath_is_an_update_not_a_collision(tmp_path):
     src, dest = tmp_path / "src", tmp_path / "dest"
     write(src / "imgs" / "a.png", "NEW")

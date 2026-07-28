@@ -389,10 +389,17 @@ rewrite_obsidian_embeds() {
                 }
                 # trim surrounding whitespace from name
                 gsub(/^[ \t]+|[ \t]+$/, "", name)
-                if (name in map && map[name] != "\001AMBIGUOUS") {
-                    out = out pre "![" caption "](" map[name] ")"
+                # Obsidian embeds a bare basename ("foo.png") normally, but falls back to
+                # a full vault-relative path ("Vault/dir/foo.png") when the basename is
+                # ambiguous elsewhere in the vault. The map is keyed by basename, so look
+                # the embed up by its own basename too.
+                key = name
+                n = split(key, parts, "/")
+                base = parts[n]
+                if (base in map && map[base] != "\001AMBIGUOUS") {
+                    out = out pre "![" caption "](" map[base] ")"
                 } else {
-                    if (name in map) {
+                    if (base in map) {
                         printf("⚠️  Ambiguous asset \"%s\" (same basename in multiple folders) — leaving embed untouched\n", name) > "/dev/stderr"
                     } else {
                         printf("⚠️  No asset found for embed \"%s\" — leaving untouched\n", name) > "/dev/stderr"
