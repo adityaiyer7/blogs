@@ -24,7 +24,7 @@ We expect to continue beyond the papers currently listed below -- this is simply
 
 Sessions are currently held every Wednesday from 7:30 to 8:30 p.m. Pacific Time. To register, please visit the [Reading Group Calendar](https://luma.com/calendar/cal-Ug3DM2lZycfcd8U).
 
-::: {.callout-note title="A Note on the Schedule"}
+::: {.callout-note title="Note"}
 - This schedule is tentative and subject to change.
 - Interactive visualizations are AI-generated and prone to errors, so please use them with caution.
 :::
