@@ -2,6 +2,7 @@
 title: "A Walkthrough of Attention"
 description: "A GPT-2–style walkthrough of causal self-attention—from a small worked example through single-head and multi-head formulations and their computational graphs."
 date: 2026-05-22
+kind: explanatory
 categories: [Deep-Learning]
 toc: true
 ---

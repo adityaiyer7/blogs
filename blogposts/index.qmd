@@ -1,15 +1,106 @@
 ---
 pagetitle: "Blogs"
 listing:
-  contents: posts
-  feed: true
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
-  fields: [date, reading-time, title, description, categories]
+  # Chronological fallback, rendered only when every kind is disabled in
+  # _post_visibility.yml. It also carries the site's only feed, so RSS stays
+  # chronological however the sections are configured.
+  - id: all-posts
+    contents: posts
+    include:
+      sections-active: "false"
+    feed: true
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
+  - id: full-research
+    contents: posts
+    include:
+      kind: full-research
+      sections-active: "true"
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
+  - id: mini-research
+    contents: posts
+    include:
+      kind: mini-research
+      sections-active: "true"
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
+  - id: explanatory
+    contents: posts
+    include:
+      kind: explanatory
+      sections-active: "true"
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
+  - id: misc
+    contents: posts
+    include:
+      kind: misc
+      sections-active: "true"
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
 page-layout: full
 title-block-banner: false
 comments: false
 ---
+
+::: {.post-kind-fallback data-post-fallback="true"}
+::: {#all-posts}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="full-research"}
+## Full Research Project Posts
+
+Completed research projects with their methods, experiments, and conclusions. Note: some work may be replications of existing papers.
+
+::: {#full-research}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="mini-research"}
+## Mini Research Posts
+
+Intermediate investigations and milestones within a broader research project.
+
+::: {#mini-research}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="explanatory"}
+## Explanatory Posts
+
+Conceptual walkthroughs, paper syntheses, and notes written to consolidate understanding.
+
+::: {#explanatory}
+:::
+:::
+
+::: {.post-kind-section data-post-kind="misc"}
+## Misc Posts
+
+Philosophy, non-technical writing, and everything else.
+
+::: {#misc}
+:::
+:::

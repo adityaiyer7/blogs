@@ -2,6 +2,7 @@
 title: "The Additivity of the Residual Stream"
 description: "Why each attention head and MLP neuron writes its own additive term into the transformer residual stream, following Anthropic's Mathematical Framework for Transformer Circuits."
 date: 2026-06-13
+kind: mini-research
 categories: [Interpretability]
 toc: true
 inline-citations: true

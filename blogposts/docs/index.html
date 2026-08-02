@@ -44,7 +44,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6fdef3033dd092da811a39d449ee8941.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-8e722473be53a3143a3739ad7bce4e13.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -75,20 +75,132 @@ ul.task-list li input[type="checkbox"] {
 <script>
 
   window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    const listingTargetEl = window.document.querySelector('#listing-all-posts .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
       return; 
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-reading-time','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+    window['quarto-listings']['listing-all-posts'] = new List('listing-all-posts', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-full-research .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-reading-time','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-image","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-full-research'] = new List('listing-full-research', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-mini-research .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-reading-time','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-image","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-mini-research'] = new List('listing-mini-research', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-explanatory .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-reading-time','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-image","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-explanatory'] = new List('listing-explanatory', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-misc .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-reading-time','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-image","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-misc'] = new List('listing-misc', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -155,6 +267,10 @@ window.Quarto = {
     <a class="nav-link" href="./"> 
 <span class="menu-text">Blogs</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./reading-group/"> 
+<span class="menu-text">Reading Group</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -182,19 +298,10 @@ window.Quarto = {
 
 
 
-
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="post-kind-fallback" data-post-fallback="true">
+<div id="listing-all-posts" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781852400000" data-listing-file-modified-sort="1782010131559" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1956">
-<div class="thumbnail"><a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/mechanistic-interpretability-glossary/assets/circuit_study_roadmap.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
+<div class="quarto-post image-right" data-index="0" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781827200000" data-listing-file-modified-sort="1785652598153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1956">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">Mechanistic Interpretability Glossary</a>
@@ -213,15 +320,11 @@ window.Quarto = {
 <div class="listing-date">
 Jun 19, 2026
 </div>
+<div class="listing-reading-time">10 min read</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781334000000" data-listing-file-modified-sort="1781931088917" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2246">
-<div class="thumbnail"><a href="./posts/additivity-of-residual-stream/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/additivity-of-residual-stream/assets/imgs/gpt-2_architecture_diagram.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
+<div class="quarto-post image-right" data-index="1" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781308800000" data-listing-file-modified-sort="1785652598151" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2246">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/additivity-of-residual-stream/index.html" class="no-external">The Additivity of the Residual Stream</a>
@@ -240,15 +343,11 @@ Jun 19, 2026
 <div class="listing-date">
 Jun 13, 2026
 </div>
+<div class="listing-reading-time">12 min read</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="UGVyc29uYWw=" data-listing-date-sort="1780642800000" data-listing-file-modified-sort="1781242199672" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2018">
-<div class="thumbnail"><a href="./posts/hundred-day-retrospective/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
+<div class="quarto-post image-right" data-index="2" data-categories="UGVyc29uYWw=" data-listing-date-sort="1780617600000" data-listing-file-modified-sort="1785652598151" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2018">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/hundred-day-retrospective/index.html" class="no-external">A retrospective on the last 100 days - Doing Hard Things</a>
@@ -267,15 +366,11 @@ Jun 13, 2026
 <div class="listing-date">
 Jun 5, 2026
 </div>
+<div class="listing-reading-time">11 min read</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="RGVlcC1MZWFybmluZw==" data-listing-date-sort="1779433200000" data-listing-file-modified-sort="1779559056529" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2364">
-<div class="thumbnail"><a href="./posts/attention-mechanism/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/attention-mechanism/assets/imgs/single-head-attention-general-formulation.svg"  class="thumbnail-image card-img"/></p>
-
-</a></div>
+<div class="quarto-post image-right" data-index="3" data-categories="RGVlcC1MZWFybmluZw==" data-listing-date-sort="1779408000000" data-listing-file-modified-sort="1785652576653" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2364">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/attention-mechanism/index.html" class="no-external">A Walkthrough of Attention</a>
@@ -294,15 +389,11 @@ Jun 5, 2026
 <div class="listing-date">
 May 22, 2026
 </div>
+<div class="listing-reading-time">12 min read</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1774854000000" data-listing-file-modified-sort="1781931088917" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="41" data-listing-word-count-sort="8121">
-<div class="thumbnail"><a href="./posts/sae-for-monosemanticity/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/sae-for-monosemanticity/assets/imgs/two_active_features.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
+<div class="quarto-post image-right" data-index="4" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1774828800000" data-listing-file-modified-sort="1785652598153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="41" data-listing-word-count-sort="8121">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/sae-for-monosemanticity/index.html" class="no-external">Sparse Autoencoders for Monosemanticity</a>
@@ -321,9 +412,37 @@ May 22, 2026
 <div class="listing-date">
 Mar 30, 2026
 </div>
+<div class="listing-reading-time">41 min read</div>
 </a>
 </div>
 </div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div>
+</div>
+
+
+
+
+
+<div class="quarto-listing quarto-listing-container-default" id="listing-full-research">
+<div class="list quarto-listing-default">
+
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div><div class="quarto-listing quarto-listing-container-default" id="listing-mini-research">
+<div class="list quarto-listing-default">
+
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div><div class="quarto-listing quarto-listing-container-default" id="listing-explanatory">
+<div class="list quarto-listing-default">
+
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div><div class="quarto-listing quarto-listing-container-default" id="listing-misc">
+<div class="list quarto-listing-default">
+
 </div>
 <div class="listing-no-matching d-none">No matching items</div>
 </div><script>
