@@ -75,7 +75,7 @@ ul.task-list li input[type="checkbox"] {
 <script>
 
   window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-full-research .list');
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
       return; 
@@ -88,91 +88,7 @@ ul.task-list li input[type="checkbox"] {
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-full-research'] = new List('listing-full-research', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-mini-research .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-image","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-mini-research'] = new List('listing-mini-research', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-explanatory .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-explanatory'] = new List('listing-explanatory', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-misc .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-image","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-misc'] = new List('listing-misc', options);
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -232,7 +148,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://iambatman.live/"> 
+    <a class="nav-link" href="https://adityaiyer.org/"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -258,27 +174,130 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Contents</h2>
-   
-  <ul>
-  <li><a href="#full-research-project-posts" id="toc-full-research-project-posts" class="nav-link active" data-scroll-target="#full-research-project-posts">Full Research Project Posts</a></li>
-  <li><a href="#explanatory-posts" id="toc-explanatory-posts" class="nav-link" data-scroll-target="#explanatory-posts">Explanatory Posts</a></li>
-  </ul>
-</nav>
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="RGVlcC1MZWFybmluZw==">Deep-Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50ZXJwcmV0YWJpbGl0eQ==">Interpretability <span class="quarto-category-count">(1)</span></div></div></div>
+        
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="RGVlcC1MZWFybmluZw==">Deep-Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50ZXJwcmV0YWJpbGl0eQ==">Interpretability <span class="quarto-category-count">(3)</span></div><div class="category" data-category="UGVyc29uYWw=">Personal <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content column-page-left" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
 
-<section id="full-research-project-posts" class="level2 post-kind-section" data-post-kind="full-research">
-<h2 class="anchored" data-anchor-id="full-research-project-posts">Full Research Project Posts</h2>
-<p>Completed research projects with their methods, experiments, and conclusions. Note: some work may be replications of existing papers.</p>
-<div id="listing-full-research" class="quarto-listing quarto-listing-container-default">
+
+
+
+
+
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1774854000000" data-listing-file-modified-sort="1779510842459" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="41" data-listing-word-count-sort="8147">
+<div class="quarto-post image-right" data-index="0" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781852400000" data-listing-file-modified-sort="1782010131559" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1956">
+<div class="thumbnail"><a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">
+
+<p class="card-img-top"><img loading='lazy' src="posts/mechanistic-interpretability-glossary/assets/circuit_study_roadmap.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">Mechanistic Interpretability Glossary</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJwcmV0YWJpbGl0eQ=='); return false;">Interpretability</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">
+<p>An informal, evolving glossary of mechanistic interpretability terms, methods, and metrics.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/mechanistic-interpretability-glossary/index.html" class="no-external">
+<div class="listing-date">
+Jun 19, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1781334000000" data-listing-file-modified-sort="1781931088917" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2246">
+<div class="thumbnail"><a href="./posts/additivity-of-residual-stream/index.html" class="no-external">
+
+<p class="card-img-top"><img loading='lazy' src="posts/additivity-of-residual-stream/assets/imgs/gpt-2_architecture_diagram.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/additivity-of-residual-stream/index.html" class="no-external">The Additivity of the Residual Stream</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJwcmV0YWJpbGl0eQ=='); return false;">Interpretability</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/additivity-of-residual-stream/index.html" class="no-external">
+<p>Why each attention head and MLP neuron writes its own additive term into the transformer residual stream, following Anthropic’s Mathematical Framework for Transformer Circuits.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/additivity-of-residual-stream/index.html" class="no-external">
+<div class="listing-date">
+Jun 13, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="UGVyc29uYWw=" data-listing-date-sort="1780642800000" data-listing-file-modified-sort="1781242199672" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2018">
+<div class="thumbnail"><a href="./posts/hundred-day-retrospective/index.html" class="no-external">
+
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/hundred-day-retrospective/index.html" class="no-external">A retrospective on the last 100 days - Doing Hard Things</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('UGVyc29uYWw='); return false;">Personal</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/hundred-day-retrospective/index.html" class="no-external">
+<p>What I mean by hard things, what I don’t, why the neuroscience behind willpower makes a compelling case for doing them anyway, and how that played out over 100 days.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/hundred-day-retrospective/index.html" class="no-external">
+<div class="listing-date">
+Jun 5, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-categories="RGVlcC1MZWFybmluZw==" data-listing-date-sort="1779433200000" data-listing-file-modified-sort="1779559056529" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2364">
+<div class="thumbnail"><a href="./posts/attention-mechanism/index.html" class="no-external">
+
+<p class="card-img-top"><img loading='lazy' src="posts/attention-mechanism/assets/imgs/single-head-attention-general-formulation.svg"  class="thumbnail-image card-img"/></p>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/attention-mechanism/index.html" class="no-external">A Walkthrough of Attention</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('RGVlcC1MZWFybmluZw=='); return false;">Deep-Learning</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/attention-mechanism/index.html" class="no-external">
+<p>A GPT-2–style walkthrough of causal self-attention—from a small worked example through single-head and multi-head formulations and their computational graphs.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/attention-mechanism/index.html" class="no-external">
+<div class="listing-date">
+May 22, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="SW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1774854000000" data-listing-file-modified-sort="1781931088917" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="41" data-listing-word-count-sort="8121">
 <div class="thumbnail"><a href="./posts/sae-for-monosemanticity/index.html" class="no-external">
 
 <p class="card-img-top"><img loading='lazy' src="posts/sae-for-monosemanticity/assets/imgs/two_active_features.png"  class="thumbnail-image card-img"/></p>
@@ -307,60 +326,20 @@ Mar 30, 2026
 </div>
 </div>
 <div class="listing-no-matching d-none">No matching items</div>
-</div>
-</section>
-<section id="explanatory-posts" class="level2 post-kind-section" data-post-kind="explanatory">
-<h2 class="anchored" data-anchor-id="explanatory-posts">Explanatory Posts</h2>
-<p>Conceptual walkthroughs, paper syntheses, and notes written to consolidate understanding.</p>
-<div id="listing-explanatory" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="RGVlcC1MZWFybmluZw==" data-listing-date-sort="1779433200000" data-listing-file-modified-sort="1779510842416" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2364">
-<div class="thumbnail"><a href="./posts/attention-mechanism/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/attention-mechanism/assets/imgs/single-head-attention-general-formulation.svg"  class="thumbnail-image card-img"/></p>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/attention-mechanism/index.html" class="no-external">A Walkthrough of Attention</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('RGVlcC1MZWFybmluZw=='); return false;">Deep-Learning</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/attention-mechanism/index.html" class="no-external">
-<p>A GPT-2–style walkthrough of causal self-attention—from a small worked example through single-head and multi-head formulations and their computational graphs.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/attention-mechanism/index.html" class="no-external">
-<div class="listing-date">
-May 22, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-</section>
-
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-mini-research">
-<div class="list quarto-listing-default">
-
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div><div class="quarto-listing quarto-listing-container-default" id="listing-misc">
-<div class="list quarto-listing-default">
-
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div><script data-goatcounter="https://adityaiyer7.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script></main> <!-- /main -->
+</div><script>
+  window.goatcounter = {
+    path: function(p) {
+      return location.pathname.replace(/index\.html$/, '');
+    }
+  };
+  (function() {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = '//gc.zgo.at/count.js';
+    s.setAttribute('data-goatcounter', 'https://adityaiyer7.goatcounter.com/count');
+    document.body.appendChild(s);
+  })();
+</script></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

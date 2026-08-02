@@ -12,30 +12,37 @@ listing:
     categories: true
     sort-ui: false
     filter-ui: false
+    fields: [date, reading-time, title, description, categories]
   - id: mini-research
     contents: posts
     include:
       kind: mini-research
     sort: "date desc"
     type: default
+    categories: true
     sort-ui: false
     filter-ui: false
+    fields: [date, reading-time, title, description, categories]
   - id: explanatory
     contents: posts
     include:
       kind: explanatory
     sort: "date desc"
     type: default
+    categories: true
     sort-ui: false
     filter-ui: false
+    fields: [date, reading-time, title, description, categories]
   - id: misc
     contents: posts
     include:
       kind: misc
     sort: "date desc"
     type: default
+    categories: true
     sort-ui: false
     filter-ui: false
+    fields: [date, reading-time, title, description, categories]
 page-layout: full
 title-block-banner: false
 comments: false

@@ -2,9 +2,11 @@ website:
   navbar:
     left:
       - text: "Home"
-        href: "https://iambatman.live/"
+        href: "https://adityaiyer.org/"
       - text: "Blogs"
         href: "/"
+      - text: "Reading Group"
+        href: "/reading-group/"
     right:
       - icon: "github"
         href: "https://github.com/adityaiyer7"

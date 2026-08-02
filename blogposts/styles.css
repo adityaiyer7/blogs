@@ -101,6 +101,16 @@ body {
   margin-top: 1rem;
 }
 
+/* Estimated reading time, injected into the post header by
+   filters/reading-time.lua. Sits just beneath the title-meta / date. */
+.reading-time {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: -0.5rem;
+  margin-bottom: 1.75rem;
+}
+
 /* ── Body text ───────────────────────────────────────────────── */
 p {
   margin-bottom: 1.3rem;
@@ -199,6 +209,19 @@ blockquote {
   font-style: italic;
 }
 
+/* ── Tables ──────────────────────────────────────────────────── */
+#quarto-document-content table {
+  border: 1px solid var(--bs-table-border-color, var(--border));
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#quarto-document-content table > :last-child > tr:last-child > * {
+  border-bottom-width: 0;
+}
+
 /* ── Table of Contents ───────────────────────────────────────── */
 #TOC {
   font-family: var(--ui-font);
@@ -252,12 +275,39 @@ blockquote {
   color: var(--text-muted);
 }
 
+.quarto-listing-default .listing-reading-time {
+  font-family: var(--ui-font);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 /* ── Footer ──────────────────────────────────────────────────── */
 .nav-footer {
   font-family: var(--ui-font);
   font-size: 0.8rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
+}
+
+/* ── Bibliography / citations ────────────────────────────────── */
+#refs {
+  font-family: var(--ui-font);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Applied globally so the citation hover popup (rendered outside #refs) also picks this up. */
+div.csl-entry {
+  margin-bottom: 0.4rem;
+}
+
+div.csl-left-margin,
+div.csl-right-inline {
+  display: inline;
+  float: none;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
