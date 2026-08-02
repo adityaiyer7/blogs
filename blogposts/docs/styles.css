@@ -101,6 +101,16 @@ body {
   margin-top: 1rem;
 }
 
+/* Estimated reading time, injected into the post header by
+   filters/reading-time.lua. Sits just beneath the title-meta / date. */
+.reading-time {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: -0.5rem;
+  margin-bottom: 1.75rem;
+}
+
 /* ── Body text ───────────────────────────────────────────────── */
 p {
   margin-bottom: 1.3rem;
@@ -260,6 +270,12 @@ blockquote {
 }
 
 .quarto-listing-default .listing-date {
+  font-family: var(--ui-font);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.quarto-listing-default .listing-reading-time {
   font-family: var(--ui-font);
   font-size: 0.78rem;
   color: var(--text-muted);

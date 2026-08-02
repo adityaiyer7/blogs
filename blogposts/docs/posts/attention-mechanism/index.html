@@ -44,7 +44,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-6fdef3033dd092da811a39d449ee8941.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-8e722473be53a3143a3739ad7bce4e13.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -119,12 +119,16 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://iambatman.live/"> 
+    <a class="nav-link" href="https://adityaiyer.org/"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../"> 
 <span class="menu-text">Blogs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../reading-group/"> 
+<span class="menu-text">Reading Group</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -207,6 +211,9 @@ window.Quarto = {
 </header>
 
 
+<div class="reading-time">
+13 min read
+</div>
 <p>Recently, I’ve been doing some reading on the mechanistic interpretability literature as part of a project that I’m working on, and one of the central ideas is attention. So I thought it might be worthwhile to consolidate my learnings in this post. While the main focus of this post is the attention mechanism, the concrete running example follows a <strong>GPT-2-style decoder-only architecture</strong> — so the dimensions (768), the learned positional embeddings, and the causal masking throughout all reflect GPT-2 rather than the original encoder-decoder transformer. I want to briefly touch on some other parts of the transformer architecture before going through the attention block.</p>
 <section id="single-head-attention-example" class="level1">
 <h1>Single-Head Attention Example</h1>
