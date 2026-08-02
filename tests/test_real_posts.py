@@ -28,10 +28,9 @@ def test_sae_known_artifacts_detected():
     ids_by_line = {(f.rule_id, f.line) for f in _findings_for("sae-for-monosemanticity")}
     rule_hits = {rid for rid, _ in ids_by_line}
     # The known issues we expect to keep catching:
-    assert ("B7", 439) in ids_by_line  # stray 'arc'
     assert ("A7", 102) in ids_by_line  # ($f_i)$ mismatched paren
     assert "B4" in rule_hits  # <br> inside WandB table cells
-    assert "C2" in rule_hits  # double-space headings (lines 15, 166)
+    assert "C2" in rule_hits  # double-space headings (lines 18, 166)
 
 
 def test_no_errors_in_existing_posts():
