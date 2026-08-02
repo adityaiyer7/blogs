@@ -117,17 +117,21 @@ Posts can render source references as academic-style superscript citations (clic
 
 ### Showing and Hiding Post Sections
 
-Homepage sections have publish-time visibility switches in `blogposts/_post_visibility.yml`:
+The homepage can either list every post in one chronological run, or split posts into four sections by post kind. Which one you get is controlled entirely by `blogposts/_post_visibility.yml`:
 
 ```yaml
 post-kind-visibility:
-  full-research: true
-  mini-research: true
-  explanatory: true
+  full-research: false
+  mini-research: false
+  explanatory: false
   misc: false
 ```
 
-Set a post kind to `false` when you do not want that section or any of its posts published. During `quarto render` or deployment, disabled posts are marked as Quarto drafts through generated metadata in `blogposts/_hidden_posts.yml`, so they are omitted from homepage listings, search results, and the sitemap. The section heading is also omitted from the homepage, and a direct URL for a disabled post renders without its article content.
+**All four `false` — the default.** The homepage renders a single chronological listing of every post, newest first. No section headings appear and nothing is hidden: every post stays in the listing, the search index, the sitemap, and the RSS feed. This is a supported configuration rather than a broken state — it is the intended setup until there are enough posts to justify splitting them into sections.
+
+**Any kind set to `true`.** The homepage switches to the sectioned view. Sections render in a fixed order — Full Research Project Posts, Mini Research Posts, Explanatory Posts, Misc Posts — and only the enabled ones appear. Posts belonging to a *disabled* kind are marked as Quarto drafts through generated metadata in `blogposts/_hidden_posts.yml`, so they are omitted from homepage listings, search results, and the sitemap, and a direct URL renders without its article content.
+
+To bring a section online once it has enough posts, set its kind to `true` and re-render. Every post needs a `kind:` field in its front matter for the sectioned view to place it — `create_post.sh` prompts for one whenever you create a post, and all existing posts already carry one. In the all-off default the `kind:` field is never read, so a missing or malformed value cannot break the published homepage.
 
 `quarto preview` can still display draft pages when opened directly, as intended for reviewing unpublished work. The deployed site uses the hidden output from a normal render.
 

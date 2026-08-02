@@ -1,12 +1,25 @@
 ---
 pagetitle: "Blogs"
-filters:
-  - filters/post_visibility.lua
 listing:
+  # Chronological fallback, rendered only when every kind is disabled in
+  # _post_visibility.yml. It also carries the site's only feed, so RSS stays
+  # chronological however the sections are configured.
+  - id: all-posts
+    contents: posts
+    include:
+      sections-active: "false"
+    feed: true
+    sort: "date desc"
+    type: default
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description, categories]
   - id: full-research
     contents: posts
     include:
       kind: full-research
+      sections-active: "true"
     sort: "date desc"
     type: default
     categories: true
@@ -17,6 +30,7 @@ listing:
     contents: posts
     include:
       kind: mini-research
+      sections-active: "true"
     sort: "date desc"
     type: default
     categories: true
@@ -27,6 +41,7 @@ listing:
     contents: posts
     include:
       kind: explanatory
+      sections-active: "true"
     sort: "date desc"
     type: default
     categories: true
@@ -37,6 +52,7 @@ listing:
     contents: posts
     include:
       kind: misc
+      sections-active: "true"
     sort: "date desc"
     type: default
     categories: true
@@ -47,6 +63,11 @@ page-layout: full
 title-block-banner: false
 comments: false
 ---
+
+::: {.post-kind-fallback data-post-fallback="true"}
+::: {#all-posts}
+:::
+:::
 
 ::: {.post-kind-section data-post-kind="full-research"}
 ## Full Research Project Posts

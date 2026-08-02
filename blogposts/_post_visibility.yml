@@ -1,7 +1,13 @@
 # Publish-time switches for each homepage post section.
-# Set a section to false to omit its posts from listings, search, and the sitemap.
+#
+# All false (the default) renders the homepage as a single chronological
+# listing of every post, with nothing hidden.
+#
+# With any section set to true the homepage becomes sectioned: only enabled
+# sections render, and posts belonging to a disabled section are omitted from
+# listings, search, and the sitemap.
 post-kind-visibility:
-  full-research: true
+  full-research: false
   mini-research: false
-  explanatory: true
+  explanatory: false
   misc: false

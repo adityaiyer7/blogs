@@ -2,6 +2,7 @@
 title: "A retrospective on the last 100 days - Doing Hard Things"
 description: "What I mean by hard things, what I don't, why the neuroscience behind willpower makes a compelling case for doing them anyway, and how that played out over 100 days."
 date: 2026-06-05
+kind: misc
 categories: [Personal]
 toc: true
 ---

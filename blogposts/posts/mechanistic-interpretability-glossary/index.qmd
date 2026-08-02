@@ -2,6 +2,7 @@
 title: "Mechanistic Interpretability Glossary"
 description: "An informal, evolving glossary of mechanistic interpretability terms, methods, and metrics."
 date: 2026-06-19
+kind: explanatory
 categories: [Interpretability]
 toc: true
 ---

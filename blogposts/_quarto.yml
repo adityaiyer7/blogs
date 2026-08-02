@@ -13,6 +13,17 @@ metadata-files:
 # surfaces it on individual post pages (see filters/reading-time.lua).
 filters:
   - filters/reading-time.lua
+  # Chooses between the sectioned homepage and the chronological fallback
+  # (see filters/post_visibility.lua). Registered project-wide rather than in
+  # index.qmd, because a document-level `filters:` key replaces this list
+  # instead of extending it, which would drop reading-time on the homepage.
+  #
+  # The filter only removes headings and wrappers. It cannot remove a listing:
+  # Quarto injects those after every Lua filter phase, so deleting a listing's
+  # placement div just makes Quarto append the orphaned listing to the end of
+  # the page. Emptying disabled listings is handled by the sections-active gate
+  # in _hidden_posts.yml instead.
+  - filters/post_visibility.lua
 
 # Render the native listing reading-time string as "N min read" (default is
 # "N min") so listing cards and post pages read identically.
