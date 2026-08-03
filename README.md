@@ -135,6 +135,52 @@ To bring a section online once it has enough posts, set its kind to `true` and r
 
 `quarto preview` can still display draft pages when opened directly, as intended for reviewing unpublished work. The deployed site uses the hidden output from a normal render.
 
+### Pinning Posts
+
+Any post can be floated to the top of the homepage listings by adding `pinned: true` to its front matter:
+
+```yaml
+---
+title: "A Walkthrough of Attention"
+date: 2026-05-22
+pinned: true
+kind: explanatory
+---
+```
+
+Unpin it by removing the line or setting `pinned: false`. **A post with no `pinned:` field is not pinned** — the default is supplied project-wide in `blogposts/_pin_defaults.yml`, so no post needs to declare it, and `create_post.sh` does not prompt for it. Pinning is an editorial decision you make after a post exists, not a property you set when creating one.
+
+Pinned cards show a **Pinned** label in the listing.
+
+#### Controlling the order of pinned posts
+
+By default, pinned posts appear newest first. To order them yourself, add `pin-order:`:
+
+```yaml
+pinned: true
+pin-order: 10
+```
+
+Lower numbers come first. Leave gaps — 10, 20, 30 — so you can slot a post in later without renumbering everything, the same convention used for series ordering. Values are compared as numbers, so `20` correctly precedes `100`; there is no need to zero-pad. Keep values well below 999999, which is reserved as the internal default.
+
+You do not have to number every pinned post. Mixing is supported, and the full order is:
+
+1. Pinned posts with a `pin-order`, lowest number first
+2. Pinned posts without one, newest first
+3. Everything else, newest first
+
+So adding `pin-order` to a single post lifts it above the other pins without forcing you to number them all.
+
+#### How pinning interacts with everything else
+
+**Sections.** In the default single-list homepage, pins are global — a pinned post rises to the top regardless of its categories. In the sectioned view, pins apply *within* each section, and the fixed section order does not change. A post never leaves its `kind` section and never appears twice.
+
+**Visibility wins over pinning.** If a post's `kind` is disabled in `_post_visibility.yml`, it stays hidden even when pinned. Pinning only reorders posts that are already showing.
+
+**Nothing else changes.** Pinning does not affect the post's own page, its categories, search, the sitemap, or its URL. The RSS feed stays in date order regardless of what is pinned.
+
+For why it is built this way, see [`docs/document_pins.md`](docs/document_pins.md).
+
 ### Deleting Blog Posts
 
 If you want to fully delete a post from your repository, do **not** just delete the source folder, as the generated `.html` files will be left behind in the `docs/` folder. Instead, use the included deletion script:
