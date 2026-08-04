@@ -1,0 +1,13 @@
+# Project-level defaults for pinned-post metadata.
+#
+# These are merged into every document, so the homepage listings can sort on
+# `pinned` and `pin-order` without every post having to declare them. A post
+# opts in by overriding `pinned` in its own front matter; document front
+# matter takes precedence over project metadata.
+#
+# `pin-order` defaults to a sentinel far above any value an author would
+# write. Under `pin-order asc` that sorts unnumbered posts after numbered
+# ones, which is what makes a single sort expression cover every ordering
+# rule (see docs/document_pins.md).
+pinned: false
+pin-order: 999999

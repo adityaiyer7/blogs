@@ -2,14 +2,19 @@
 pagetitle: "Blogs"
 listing:
   # Chronological fallback, rendered only when every kind is disabled in
-  # _post_visibility.yml. It also carries the site's only feed, so RSS stays
-  # chronological however the sections are configured.
+  # _post_visibility.yml. It also carries the site's only feed.
+  #
+  # Every listing sorts pinned posts first (see _pin_defaults.yml). The feed is
+  # unaffected: Quarto builds it in date order regardless of the listing's
+  # display sort, so RSS stays chronological however the sections are
+  # configured and however posts are pinned. Verified against 1.9.36 -- see
+  # docs/document_pins.md.
   - id: all-posts
     contents: posts
     include:
       sections-active: "false"
     feed: true
-    sort: "date desc"
+    sort: ["pinned desc", "pin-order asc", "date desc"]
     type: default
     categories: true
     sort-ui: false
@@ -20,7 +25,7 @@ listing:
     include:
       kind: full-research
       sections-active: "true"
-    sort: "date desc"
+    sort: ["pinned desc", "pin-order asc", "date desc"]
     type: default
     categories: true
     sort-ui: false
@@ -31,7 +36,7 @@ listing:
     include:
       kind: mini-research
       sections-active: "true"
-    sort: "date desc"
+    sort: ["pinned desc", "pin-order asc", "date desc"]
     type: default
     categories: true
     sort-ui: false
@@ -42,7 +47,7 @@ listing:
     include:
       kind: explanatory
       sections-active: "true"
-    sort: "date desc"
+    sort: ["pinned desc", "pin-order asc", "date desc"]
     type: default
     categories: true
     sort-ui: false
@@ -53,7 +58,7 @@ listing:
     include:
       kind: misc
       sections-active: "true"
-    sort: "date desc"
+    sort: ["pinned desc", "pin-order asc", "date desc"]
     type: default
     categories: true
     sort-ui: false

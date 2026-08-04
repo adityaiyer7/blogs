@@ -3,11 +3,16 @@ project:
   output-dir: docs
   pre-render:
     - python3 scripts/update_post_visibility.py
+  # Adds the "Pinned" badge to listing cards. Ordering is handled natively by
+  # the listing sort; only the badge needs post-processing (see the script).
+  post-render:
+    - python3 scripts/inject_pin_badges.py
 
 metadata-files:
   - _links.yml
   - _post_visibility.yml
   - _hidden_posts.yml
+  - _pin_defaults.yml
 
 # Estimated reading time. Native to Quarto listings only; this filter also
 # surfaces it on individual post pages (see filters/reading-time.lua).
