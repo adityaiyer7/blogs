@@ -10,6 +10,8 @@ from ..model import Finding, Severity, rule
 from ..parser import Document
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_SERIES_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+_SERIES_KEYS = ("series-id", "series", "series-order")
 
 
 def _fm_start(doc: Document) -> int:
@@ -66,3 +68,64 @@ def f4_categories_list(doc: Document) -> list[Finding]:
     if not isinstance(doc.front_matter["categories"], list):
         return [Finding("F4", Severity.WARNING, _fm_start(doc), "categories should be a list, e.g. [AI, Math]")]
     return []
+
+
+@rule("F5", "F", Severity.WARNING)
+def f5_series_metadata(doc: Document) -> list[Finding]:
+    """Series metadata is optional, but a partial or malformed set fails silently.
+
+    A post carrying `series:` without `series-id:` renders perfectly and is
+    simply absent from its landing page — nothing errors and nothing looks
+    wrong, so the only way to notice is to go looking. Same for a `series-order`
+    that YAML read as a string: the landing page then sorts it lexicographically
+    against the integers. Hence a warning rather than trusting authors to
+    remember. See docs/design/series.md.
+    """
+    if not doc.front_matter:
+        return []
+
+    present = [key for key in _SERIES_KEYS if key in doc.front_matter]
+    if not present:
+        return []
+
+    line = _fm_start(doc)
+    out = []
+
+    missing = [key for key in _SERIES_KEYS if key not in doc.front_matter]
+    if missing:
+        out.append(
+            Finding(
+                "F5",
+                Severity.WARNING,
+                line,
+                "series metadata is incomplete: has "
+                + ", ".join(present)
+                + " but is missing "
+                + ", ".join(missing),
+            )
+        )
+
+    series_id = doc.front_matter.get("series-id")
+    if series_id is not None and not _SERIES_ID_RE.match(str(series_id).strip()):
+        out.append(
+            Finding(
+                "F5",
+                Severity.WARNING,
+                line,
+                f"series-id should be lowercase kebab-case, got: {series_id!r}",
+            )
+        )
+
+    order = doc.front_matter.get("series-order")
+    # bool is an int subclass, and `series-order: true` is never intended.
+    if order is not None and (isinstance(order, bool) or not isinstance(order, int)):
+        out.append(
+            Finding(
+                "F5",
+                Severity.WARNING,
+                line,
+                f"series-order should be an integer, got: {order!r}",
+            )
+        )
+
+    return out
