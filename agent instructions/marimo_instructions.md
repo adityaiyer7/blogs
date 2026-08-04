@@ -36,12 +36,14 @@ instructions; it does not override them.
 This is a supplemental instruction file. Its directory name does not, by
 itself, make Codex or another agent load it automatically. The repository's
 root instruction mechanism must point agents to this file for marimo-related
-tasks. That pointer may live in a root `AGENTS.md` or in the external workspace
-configuration that supplies the active repository instructions.
+tasks.
 
-If no such pointer exists, do not claim that these instructions are
-automatically enforced. Add the reference only through the repository's chosen
-instruction mechanism and only with authorization to modify that mechanism.
+That pointer now exists: root `agent_instructions.md` is the single source of
+truth for this repository and indexes this file under "Scope and precedence".
+The root `AGENTS.md` and `CLAUDE.md` are pointers to it, so a tool that
+auto-loads either filename reaches these instructions. Register any new
+supplemental instruction file the same way — through `agent_instructions.md`,
+and only with authorization to modify it.
 
 ## Mental model
 

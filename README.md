@@ -283,6 +283,18 @@ The PDF will reflect the full site styling (theme, fonts, layout) since it is ge
 
 > **Note:** Add `*.pdf` to your `.gitignore` if you do not want PDFs accidentally committed to the repository.
 
+## Working with AI Coding Agents
+
+Much of this repository was built with AI coding tools. The conventions they are
+expected to follow — branch naming, commit and PR standards, when a design doc is
+required, and the testing policy — live in [`agent_instructions.md`](agent_instructions.md).
+That file is model-agnostic and is the single source of truth; the root
+`AGENTS.md` and `CLAUDE.md` are one-line pointers to it so that whichever tool
+auto-loads its own filename still ends up in the right place.
+
+Design docs for features go in [`docs/design/`](docs/design/README.md) (not to be
+confused with `blogposts/docs/`, which is generated Quarto output).
+
 <details>
 <summary>Repo Notes</summary>
 
