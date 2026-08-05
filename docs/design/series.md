@@ -80,6 +80,12 @@ cards and no warning**. So does a project-root-relative `contents: /posts`. Only
 This is recorded because the failure is silent and looks exactly like "the filter
 matched nothing". Anyone debugging an empty series page should check this first.
 
+`field-required: [series-id, series, series-order]` is deliberately absent. Quarto
+validates required fields against every document matched by `contents` *before* applying
+`include`, so ordinary non-series posts fail the render for lacking the series fields.
+The shared post-render validator enforces the contract without making optional metadata
+mandatory across the whole blog.
+
 ### D3 — The homepage label shares the pin badge's injector rather than adding a second one
 
 **Decision.** `blogposts/scripts/inject_pin_badges.py` was renamed to
@@ -168,15 +174,25 @@ situation as a series that simply has not been finished yet, which the landing p
 cannot distinguish, and #35 explicitly rules out placeholder documents for unwritten
 entries.
 
-### D9 — One linter rule, not four
+### D9 — One shared, render-blocking validator
 
-`qmd_lint` rule **F5** (WARNING) fires on partial series metadata, a `series-id` that is
-not lowercase kebab-case, and a `series-order` that is not an integer.
+`tools/series_metadata.py` defines the flat metadata contract once. `qmd_lint` rule
+**F5** (ERROR) reports its failures during authoring, and the listing injector runs the
+same validator before rewriting any output. This second gate matters because a normal
+Quarto render does not automatically run `check_post.sh`; invalid metadata must still
+stop deployment rather than publish a broken or contradictory series UI.
 
-The failure it exists for is genuinely silent: a post with `series:` but no `series-id:`
-renders perfectly, is simply absent from its landing page, and nothing anywhere reports
-why. A `series-order` that YAML read as a string (`"10"`) sorts lexicographically
-against the integers.
+All three fields are required when any one is present. `series-id` and `series` are
+non-empty, single-line strings in plain, single-quoted, or double-quoted form; inline
+comments are supported. `series-id` remains lowercase kebab-case, and `series-order` is
+an unquoted base-10 integer. Blank/null values, collections, block scalars, booleans,
+quoted orders, duplicate keys, and incomplete sets are errors.
+
+The parser is standard-library-only because Quarto invokes the injector with plain
+`python3`. Although PyYAML is a project dependency, it is not available to that
+interpreter in a fresh local render unless the uv environment is active. The deliberately
+small scalar grammar keeps `quarto render` dependency-free while covering the documented
+authoring forms.
 
 **Cross-document checks were rejected**, including the duplicate-`series-order` check
 #35 floated. `collect_findings` in `tools/qmd_lint/engine.py` runs rules over a single
@@ -184,7 +200,18 @@ parsed `Document`; there is no cross-document phase, and adding one to support a
 about two posts sharing an order value — which produces an arbitrary but stable order,
 not a broken page — is not a trade worth making.
 
-### D10 — Shipped with nothing in a series
+### D10 — Empty landing pages say that nothing is published yet
+
+Quarto emits an empty listing container when the posts glob matches documents but the
+`series-id` filter matches none. The shared post-render pass detects that state only for
+the `series-posts` listing and inserts "No posts in this series have been published
+yet." It removes ambiguity between an intentionally empty series and a failed render.
+
+The injection is idempotent and guarded like the card annotations: if the named listing
+exists but Quarto's empty-listing markup no longer matches, the render fails loudly.
+Inactive homepage listings are never eligible for this message.
+
+### D11 — Shipped with nothing in a series
 
 No post carries series metadata on merge, and no landing page exists yet. This follows
 pinning's D6: the mechanism is live, and creating a series is an editorial act. Every
@@ -198,12 +225,14 @@ future landing page inherits. A directory containing only that file renders no p
 
 - All three fields are optional. A post with none of them is unaffected everywhere:
   verified byte-identical homepage markup apart from the injected labels.
-- The three fields are all-or-nothing. A partial set draws an F5 warning, is skipped by
-  the injector (no label), and is skipped by the banner filter.
+- The three fields are all-or-nothing. A partial or malformed set draws an F5 error and
+  aborts the post-render pass before it writes any HTML; direct consumers also require
+  the complete set.
 - Series ordering applies on landing pages only. Homepage sort is unchanged.
 - A series may be incomplete and published out of conceptual order. Nothing fails.
 - Adding a published post to an existing series requires only the three fields; the
   landing page updates on the next render.
+- A landing page with no published members shows an explicit empty-state message.
 - RSS is unaffected. `document_pins.md` D4 established that Quarto builds feeds in date
   order regardless of a listing's display sort, and the feed does not currently generate
   at all (`website.title` is unset). Confirmed unchanged, not rebuilt.

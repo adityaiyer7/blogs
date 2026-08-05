@@ -37,7 +37,8 @@ function Pandoc(doc)
 
   local series_id = doc.meta["series-id"]
   local series_title = doc.meta["series"]
-  if not series_id or not series_title then return nil end
+  local series_order = doc.meta["series-order"]
+  if not series_id or not series_title or not series_order then return nil end
 
   local id = pandoc.utils.stringify(series_id)
   local title = pandoc.utils.stringify(series_title)

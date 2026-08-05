@@ -204,7 +204,7 @@ series-order: 10
 - **`series`** — the title readers see on cards and post pages.
 - **`series-order`** — where the post sits *conceptually*. Nothing to do with when it was published.
 
-**All three or none.** A post with only some of them renders fine but quietly drops out of its own series page, so `./check_post.sh` warns about a partial set (rule F5).
+**All three or none.** Rule F5 treats a partial or malformed set as an error, and the site render stops before publishing broken labels or links. `series-id` and `series` must be non-empty, single-line strings; use plain text, single quotes, or double quotes. Inline YAML comments are supported. `series-order` must be an unquoted base-10 integer.
 
 Leave gaps — 10, 20, 30 — so a prerequisite can be slotted in later without renumbering. Values are compared as numbers, so `20` correctly precedes `100`.
 
@@ -232,7 +232,7 @@ listing:
 
 Keep `contents:` exactly as written. A bare `contents: ../../posts` renders an **empty page with no warning** — that is the first thing to check if a series page comes out blank.
 
-You can create the page before writing any of its posts; it renders as a title and description with nothing under it. After that, adding a post to the series is just the three fields — the page picks it up on the next render.
+You can create the page before writing any of its posts; it renders the message "No posts in this series have been published yet." After that, adding a post to the series is just the three fields — the page picks it up on the next render and the empty message disappears automatically.
 
 #### Where series membership shows up
 
@@ -244,7 +244,7 @@ You can create the page before writing any of its posts; it renders as a title a
 
 #### Publishing out of order, and half-finished series
 
-Both are fine and need no bookkeeping. Publish CKA before CCA and the series page still reads SVD → CCA → CKA once CCA exists; until then it lists what exists. Do not create placeholder posts for unwritten entries.
+Both are fine and need no bookkeeping. Publish CKA before CCA and the series page still reads SVD → CCA → CKA once CCA exists; until then it lists what exists. Do not create placeholder posts for unwritten entries. Missing future posts are an incomplete *series* and remain valid; missing fields on a post are malformed *metadata* and stop the render.
 
 **Hidden posts drop out.** If a series post's `kind` is disabled in `_post_visibility.yml`, it disappears from its series page along with everywhere else — no gap, no placeholder. The remaining posts keep their order. Re-enable the section and it returns.
 

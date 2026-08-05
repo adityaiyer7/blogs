@@ -339,6 +339,15 @@ blockquote {
   margin-top: 0.1rem;
 }
 
+/* Explicit empty state for a series landing page with no published members.
+   The post-render injector adds this only to the `series-posts` listing. */
+.series-empty-state {
+  font-family: var(--ui-font);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0 1.5rem;
+}
+
 .quarto-listing-default .listing-date {
   font-family: var(--ui-font);
   font-size: 0.78rem;

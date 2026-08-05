@@ -34,6 +34,13 @@ from pathlib import Path
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = PROJECT_DIR.parent
+if str(REPO_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_DIR))
+
+from tools.series_metadata import parse_series_metadata
+
+
 POSTS_DIR = PROJECT_DIR / "posts"
 # Quarto hands post-render scripts the real output directory. Fall back to the
 # configured one so the script is still runnable by hand.
@@ -42,11 +49,15 @@ OUTPUT_DIR = PROJECT_DIR / os.environ.get("QUARTO_PROJECT_OUTPUT_DIR", "docs")
 BADGE_CLASS = "listing-pinned-badge"
 BADGE_HTML = f'<div class="{BADGE_CLASS}">Pinned</div>\n'
 SERIES_CLASS = "listing-series-label"
+EMPTY_CLASS = "series-empty-state"
+EMPTY_HTML = (
+    f'<p class="{EMPTY_CLASS}">'
+    "No posts in this series have been published yet.</p>\n"
+)
+SERIES_LISTING_ID = "listing-series-posts"
 
 FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 PINNED_RE = re.compile(r"^pinned:\s*(true|false)\s*(?:#.*)?$", re.MULTILINE)
-SERIES_ID_RE = re.compile(r"^series-id:\s*(\S+?)\s*(?:#.*)?$", re.MULTILINE)
-SERIES_TITLE_RE = re.compile(r"^series:\s*(.+?)\s*$", re.MULTILINE)
 # Cards are emitted as <div class="quarto-post ..."> ... and the post they link
 # to is the first href inside. Matching the opening tag plus that href is
 # enough to identify the card without parsing the whole document.
@@ -59,6 +70,17 @@ CARD_RE = re.compile(
 # the homepage, "../../" from a series page. Reusing it keeps injected links
 # correct at any depth (see series_label_html).
 HREF_RE = re.compile(r'href="([^"]*?)posts/([^/"]+)/index\.html"')
+EMPTY_SERIES_LISTING_RE = re.compile(
+    rf'(<div(?=[^>]*\bid="{SERIES_LISTING_ID}")[^>]*>\s*'
+    r'<div class="list quarto-listing-default">)\s*(</div>)',
+    re.DOTALL,
+)
+SERIES_LISTING_START_RE = re.compile(
+    rf'<div(?=[^>]*\bid="{SERIES_LISTING_ID}")[^>]*>\s*'
+    r'<div class="list quarto-listing-default">',
+    re.DOTALL,
+)
+LISTING_NO_MATCHING_RE = re.compile(r'<div class="listing-no-matching\b')
 
 
 @dataclass(frozen=True)
@@ -68,17 +90,21 @@ class PostMeta:
     pinned: bool = False
     series_id: str | None = None
     series_title: str | None = None
+    series_order: int | None = None
 
-
-def _unquote(value: str) -> str:
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-        return value[1:-1]
-    return value
+    @property
+    def has_complete_series(self) -> bool:
+        return (
+            self.series_id is not None
+            and self.series_title is not None
+            and self.series_order is not None
+        )
 
 
 def post_metadata() -> dict[str, PostMeta]:
     """Map each post slug to the front-matter fields the cards care about."""
     meta: dict[str, PostMeta] = {}
+    errors: list[str] = []
     for post_path in sorted(POSTS_DIR.rglob("index.qmd")):
         front_matter = FRONT_MATTER_RE.match(post_path.read_text(encoding="utf-8"))
         if front_matter is None:
@@ -86,13 +112,20 @@ def post_metadata() -> dict[str, PostMeta]:
         block = front_matter.group(1)
 
         pinned = PINNED_RE.search(block)
-        series_id = SERIES_ID_RE.search(block)
-        series_title = SERIES_TITLE_RE.search(block)
+        series, series_errors = parse_series_metadata(block)
+        errors.extend(f"{post_path}: {error}" for error in series_errors)
 
         meta[post_path.parent.name] = PostMeta(
             pinned=bool(pinned) and pinned.group(1) == "true",
-            series_id=series_id.group(1) if series_id else None,
-            series_title=_unquote(series_title.group(1)) if series_title else None,
+            series_id=series.series_id if series else None,
+            series_title=series.title if series else None,
+            series_order=series.order if series else None,
+        )
+
+    if errors:
+        raise SystemExit(
+            "inject_listing_badges: invalid series metadata:\n  "
+            + "\n  ".join(errors)
         )
     return meta
 
@@ -141,9 +174,10 @@ def annotate_page(
         insertions = []
         if post.pinned:
             insertions.append(BADGE_HTML)
-        # A series post missing either field is not labelled; the linter warns
-        # about the partial metadata separately (rule F5).
-        if not on_series_page and post.series_id and post.series_title:
+        # Invalid partial metadata aborts before this pass; requiring the full
+        # typed set here keeps direct callers safe as well.
+        if not on_series_page and post.has_complete_series:
+            assert post.series_id is not None and post.series_title is not None
             insertions.append(series_label_html(href.group(1), post.series_id, post.series_title))
 
         for markup in insertions:
@@ -167,6 +201,38 @@ def annotate_page(
     return "".join(out), added
 
 
+def add_series_empty_state(html_text: str) -> tuple[str, bool]:
+    """Add the empty-series message to an empty `series-posts` listing."""
+    if SERIES_LISTING_ID not in html_text:
+        return html_text, False
+    if EMPTY_CLASS in html_text:
+        return html_text, False
+
+    match = EMPTY_SERIES_LISTING_RE.search(html_text)
+    if match is not None:
+        updated = html_text[: match.start()] + match.group(1) + "\n" + EMPTY_HTML
+        updated += match.group(2) + html_text[match.end() :]
+        return updated, True
+
+    listing_start = SERIES_LISTING_START_RE.search(html_text)
+    no_matching = (
+        LISTING_NO_MATCHING_RE.search(html_text, listing_start.end())
+        if listing_start is not None
+        else None
+    )
+    if (
+        listing_start is not None
+        and no_matching is not None
+        and 'class="quarto-post' in html_text[listing_start.end() : no_matching.start()]
+    ):
+        return html_text, False
+
+    raise SystemExit(
+        "inject_listing_badges: found the series-posts listing but could not "
+        "match its empty markup; Quarto's listing output has changed."
+    )
+
+
 def is_series_page(page: Path) -> bool:
     """True for output pages living under a `series/` directory."""
     return "series" in page.relative_to(OUTPUT_DIR).parts[:-1]
@@ -175,14 +241,20 @@ def is_series_page(page: Path) -> bool:
 def main() -> None:
     meta = post_metadata()
     total = 0
+    empty_states = 0
     for page in sorted(OUTPUT_DIR.rglob("*.html")):
         html_text = page.read_text(encoding="utf-8")
         if "quarto-listing" not in html_text:
             continue
-        updated, added = annotate_page(html_text, meta, is_series_page(page))
-        if added:
+        series_page = is_series_page(page)
+        updated, added = annotate_page(html_text, meta, series_page)
+        empty_added = False
+        if series_page:
+            updated, empty_added = add_series_empty_state(updated)
+        if added or empty_added:
             page.write_text(updated, encoding="utf-8")
             total += added
+            empty_states += int(empty_added)
 
     pinned = sorted(slug for slug, post in meta.items() if post.pinned)
     in_series = sorted(slug for slug, post in meta.items() if post.series_id)
@@ -193,6 +265,12 @@ def main() -> None:
     if total:
         print(
             f"Injected {total} listing annotation{'' if total == 1 else 's'}",
+            file=sys.stderr,
+        )
+    if empty_states:
+        print(
+            f"Injected {empty_states} empty series state"
+            f"{'' if empty_states == 1 else 's'}",
             file=sys.stderr,
         )
 

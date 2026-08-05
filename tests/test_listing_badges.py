@@ -28,11 +28,13 @@ PINNED = badges.PostMeta(pinned=True)
 IN_SERIES = badges.PostMeta(
     series_id="representational-geometry",
     series_title="Representational Geometry from First Principles",
+    series_order=10,
 )
 PINNED_IN_SERIES = badges.PostMeta(
     pinned=True,
     series_id="representational-geometry",
     series_title="Representational Geometry from First Principles",
+    series_order=10,
 )
 
 
@@ -52,9 +54,18 @@ def card(slug: str, prefix: str = "./") -> str:
     )
 
 
-def page(*slugs: str, prefix: str = "./") -> str:
+def page(*slugs: str, prefix: str = "./", listing_id: str = "listing-all-posts") -> str:
     body = "".join(card(s, prefix) for s in slugs)
-    return f'<div class="quarto-listing" id="listing-all-posts">\n{body}</div>\n'
+    return f'<div class="quarto-listing" id="{listing_id}">\n{body}</div>\n'
+
+
+def empty_series_page() -> str:
+    return (
+        '<div class="quarto-listing quarto-listing-container-default" '
+        'id="listing-series-posts">\n'
+        '<div class="list quarto-listing-default">\n\n</div>\n'
+        '<div class="listing-no-matching d-none">No matching items</div>\n</div>\n'
+    )
 
 
 # ── Pin badges ──────────────────────────────────────────────────────────────
@@ -172,15 +183,20 @@ def test_reprocessing_does_not_double_label():
 
 
 def test_partial_series_metadata_produces_no_label():
-    # series-id without a title has nothing to render; rule F5 warns separately.
-    partial = badges.PostMeta(series_id="representational-geometry")
+    # Direct callers are safe even though normal rendering rejects this set.
+    partial = badges.PostMeta(
+        series_id="representational-geometry",
+        series_title="Representational Geometry",
+    )
     html, added = badges.annotate_page(page("alpha"), {"alpha": partial})
     assert added == 0
     assert badges.SERIES_CLASS not in html
 
 
 def test_series_title_is_html_escaped():
-    risky = badges.PostMeta(series_id="s", series_title='Cats & "Dogs" <b>')
+    risky = badges.PostMeta(
+        series_id="s", series_title='Cats & "Dogs" <b>', series_order=10
+    )
     html, _ = badges.annotate_page(page("alpha"), {"alpha": risky})
     assert "Cats &amp; &quot;Dogs&quot; &lt;b&gt;" in html
     assert "<b>" not in html.split('<div class="listing-series-label">')[1]
@@ -219,20 +235,85 @@ def test_post_metadata_reads_series_fields(tmp_path, monkeypatch):
         "POSTS_DIR",
         _write_post(
             tmp_path,
-            'series-id: representational-geometry\nseries: "Representational Geometry"',
+            'series-id: representational-geometry\n'
+            'series: "Representational Geometry"\nseries-order: 10',
         ),
     )
     meta = badges.post_metadata()["slug"]
     assert meta.series_id == "representational-geometry"
     # The quotes are YAML syntax, not part of the title.
     assert meta.series_title == "Representational Geometry"
+    assert meta.series_order == 10
 
 
-def test_post_metadata_ignores_unquoted_and_absent_series(tmp_path, monkeypatch):
-    monkeypatch.setattr(badges, "POSTS_DIR", _write_post(tmp_path, "series: Plain Title"))
-    meta = badges.post_metadata()["slug"]
-    assert meta.series_title == "Plain Title"
-    assert meta.series_id is None
+@pytest.mark.parametrize(
+    "title, expected",
+    [
+        ("Plain Title # display title", "Plain Title"),
+        ('"Representational \\"Geometry\\"" # display title', 'Representational "Geometry"'),
+        ("'Author''s Series' # display title", "Author's Series"),
+    ],
+)
+def test_post_metadata_parses_supported_string_forms(
+    tmp_path, monkeypatch, title, expected
+):
+    front_matter = (
+        "series-id: representational-geometry # stable URL\n"
+        f"series: {title}\n"
+        "series-order: 10 # conceptual order"
+    )
+    monkeypatch.setattr(badges, "POSTS_DIR", _write_post(tmp_path, front_matter))
+    assert badges.post_metadata()["slug"].series_title == expected
+
+
+@pytest.mark.parametrize(
+    "front_matter, expected_error",
+    [
+        ("series-id: representational-geometry", "missing series, series-order"),
+        ("series-id:\nseries:\nseries-order:", "series-id: must be"),
+        (
+            "series-id: Representational Geometry\nseries: RG\nseries-order: 10",
+            "series-id: must be lowercase kebab-case",
+        ),
+        (
+            "series-id: rg\nseries: RG\nseries-order: true",
+            "series-order: must be an unquoted base-10 integer",
+        ),
+        (
+            'series-id: rg\nseries: RG\nseries-order: "10"',
+            "series-order: must be an unquoted base-10 integer",
+        ),
+        (
+            "series-id: rg\nseries: >\n  A multiline title\nseries-order: 10",
+            "series: must be a plain or quoted single-line string",
+        ),
+    ],
+)
+def test_post_metadata_rejects_invalid_series_before_render(
+    tmp_path, monkeypatch, front_matter, expected_error
+):
+    monkeypatch.setattr(badges, "POSTS_DIR", _write_post(tmp_path, front_matter))
+    with pytest.raises(SystemExit, match="invalid series metadata") as exc:
+        badges.post_metadata()
+    assert expected_error in str(exc.value)
+
+
+def test_main_validates_all_posts_before_rewriting_output(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        badges,
+        "POSTS_DIR",
+        _write_post(tmp_path, "series-id: incomplete"),
+    )
+    output = tmp_path / "output"
+    output.mkdir()
+    page_path = output / "index.html"
+    original = page("slug")
+    page_path.write_text(original, encoding="utf-8")
+    monkeypatch.setattr(badges, "OUTPUT_DIR", output)
+
+    with pytest.raises(SystemExit, match="invalid series metadata"):
+        badges.main()
+    assert page_path.read_text(encoding="utf-8") == original
 
 
 def test_metadata_fields_in_body_are_ignored(tmp_path, monkeypatch):
@@ -244,6 +325,50 @@ def test_metadata_fields_in_body_are_ignored(tmp_path, monkeypatch):
     meta = badges.post_metadata()["slug"]
     assert meta.pinned is False
     assert meta.series_id is None
+
+
+# ── Series empty state ──────────────────────────────────────────────────────
+
+
+def test_empty_series_listing_gets_explicit_message():
+    html, added = badges.add_series_empty_state(empty_series_page())
+    assert added
+    assert badges.EMPTY_HTML in html
+
+
+def test_other_listing_cards_do_not_hide_empty_series_message():
+    html = page("unrelated") + empty_series_page()
+    updated, added = badges.add_series_empty_state(html)
+    assert added
+    assert badges.EMPTY_HTML in updated
+
+
+def test_populated_series_listing_has_no_empty_message():
+    populated = empty_series_page().replace(
+        "\n\n</div>", "\n" + card("alpha") + "</div>", 1
+    )
+    html, added = badges.add_series_empty_state(populated)
+    assert not added
+    assert badges.EMPTY_CLASS not in html
+
+
+def test_empty_homepage_listing_has_no_series_empty_message():
+    html, added = badges.add_series_empty_state(page())
+    assert not added
+    assert badges.EMPTY_CLASS not in html
+
+
+def test_reprocessing_does_not_duplicate_empty_message():
+    once, _ = badges.add_series_empty_state(empty_series_page())
+    twice, added = badges.add_series_empty_state(once)
+    assert not added
+    assert twice.count(badges.EMPTY_CLASS) == 1
+
+
+def test_unmatched_empty_series_markup_fails_loudly():
+    drifted = '<section id="listing-series-posts"><p>empty</p></section>'
+    with pytest.raises(SystemExit, match="empty markup"):
+        badges.add_series_empty_state(drifted)
 
 
 def test_is_series_page_only_matches_the_series_directory(tmp_path, monkeypatch):
