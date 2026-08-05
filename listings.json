@@ -2,11 +2,11 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/sae-for-monosemanticity/index.html",
       "/posts/mechanistic-interpretability-glossary/index.html",
       "/posts/additivity-of-residual-stream/index.html",
       "/posts/hundred-day-retrospective/index.html",
-      "/posts/attention-mechanism/index.html",
-      "/posts/sae-for-monosemanticity/index.html"
+      "/posts/attention-mechanism/index.html"
     ]
   }
 ]
