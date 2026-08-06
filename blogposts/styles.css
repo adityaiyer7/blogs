@@ -299,6 +299,43 @@ blockquote {
   color: var(--text-muted);
 }
 
+/* Categories filter sidebar. Functionally a nav list (it filters the listing
+   on click), not a metadata tag, so it follows #TOC's plain-list treatment
+   rather than the bordered-pill look used for .listing-category /
+   .listing-pinned-badge / .quarto-category. */
+#quarto-margin-sidebar .quarto-listing-category-title {
+  font-family: var(--ui-font);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+#quarto-margin-sidebar .quarto-listing-category .category {
+  font-family: var(--ui-font);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+#quarto-margin-sidebar .quarto-listing-category .category:hover {
+  color: var(--accent);
+}
+
+#quarto-margin-sidebar .quarto-listing-category .category.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#quarto-margin-sidebar .quarto-category-count {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
 /* ── Footer ──────────────────────────────────────────────────── */
 .nav-footer {
   font-family: var(--ui-font);
