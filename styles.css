@@ -270,16 +270,18 @@ blockquote {
 }
 
 /* Pinned marker, injected by scripts/inject_pin_badges.py. Visible text rather
-   than an icon, so it carries meaning without relying on colour or shape. */
+   than an icon, so it carries meaning without relying on colour or shape.
+   Styled to match the muted, uncoloured look of .listing-category (the
+   Quarto-default category tag) rather than standing out as an accent-coloured
+   UI element. */
 .quarto-listing-default .listing-pinned-badge {
   display: inline-block;
   font-family: var(--ui-font);
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 400;
   text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid var(--accent);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
   border-radius: 2px;
   padding: 0.1rem 0.4rem;
   margin-bottom: 0.4rem;
