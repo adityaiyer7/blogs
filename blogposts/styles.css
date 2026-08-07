@@ -299,18 +299,22 @@ blockquote {
   color: var(--text-muted);
 }
 
-/* Categories filter sidebar, as a single floating card (not a per-item box —
-   that would compete with the bordered-pill tags used by .listing-category /
-   .listing-pinned-badge / .quarto-category elsewhere on the page). The card
-   background/border/radius mirror the site's one other "boxed content"
-   pattern (`pre`, above). Scoped with :has() rather than styling
-   #quarto-margin-sidebar directly, since that same container id also holds
-   #TOC on post pages, which should stay a plain list. */
+/* Categories filter sidebar, as a single thin-outlined box (not a per-item
+   box — that would compete with the bordered-pill tags used by
+   .listing-category / .listing-pinned-badge / .quarto-category elsewhere on
+   the page). align-self: start keeps the box sized to its own content —
+   without it, the grid's default `align-items: stretch` pads
+   #quarto-margin-sidebar out to the height of the whole listing column, so
+   the outline reads as a giant slab instead of hugging the category list
+   (and growing/shrinking with it as categories are added or removed).
+   Scoped with :has() rather than styling #quarto-margin-sidebar directly,
+   since that same container id also holds #TOC on post pages, which should
+   stay a plain list. */
 #quarto-margin-sidebar:has(.quarto-listing-category-title) {
-  background: #f4f4f1;
+  align-self: start;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   padding: 1rem 1.25rem;
 }
 
