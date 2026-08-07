@@ -299,10 +299,21 @@ blockquote {
   color: var(--text-muted);
 }
 
-/* Categories filter sidebar. Functionally a nav list (it filters the listing
-   on click), not a metadata tag, so it follows #TOC's plain-list treatment
-   rather than the bordered-pill look used for .listing-category /
-   .listing-pinned-badge / .quarto-category. */
+/* Categories filter sidebar, as a single floating card (not a per-item box —
+   that would compete with the bordered-pill tags used by .listing-category /
+   .listing-pinned-badge / .quarto-category elsewhere on the page). The card
+   background/border/radius mirror the site's one other "boxed content"
+   pattern (`pre`, above). Scoped with :has() rather than styling
+   #quarto-margin-sidebar directly, since that same container id also holds
+   #TOC on post pages, which should stay a plain list. */
+#quarto-margin-sidebar:has(.quarto-listing-category-title) {
+  background: #f4f4f1;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+}
+
 #quarto-margin-sidebar .quarto-listing-category-title {
   font-family: var(--ui-font);
   font-size: 0.75rem;
@@ -320,6 +331,10 @@ blockquote {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
+}
+
+#quarto-margin-sidebar .quarto-listing-category .category:last-child {
+  margin-bottom: 0;
 }
 
 #quarto-margin-sidebar .quarto-listing-category .category:hover {
