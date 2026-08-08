@@ -63,12 +63,29 @@ def test_callout_body_delete_beats_same_line_whitespace_fix(fix):
 
 def test_movie_quote_conversion(fix):
     text, _, remaining = fix('> [!moviequote] The Dark Knight — 2026-08-08\n> "Why so serious?"\n')
-    assert "::: {.movie-quote}" in text
-    assert '<span class="movie-quote-title">The Dark Knight</span>' in text
-    assert '<span class="movie-quote-date">2026-08-08</span>' in text
+    assert "::: {.lit-quote}" in text
+    assert '<span class="lit-quote-kind">Movie</span>' in text
+    assert '<span class="lit-quote-source">The Dark Knight</span>' in text
+    assert '<span class="lit-quote-date">2026-08-08</span>' in text
     assert '> "Why so serious?"' in text  # quote body kept as a blockquote
     assert "[!moviequote]" not in text
     assert not any(f.rule_id in ("Q1", "Q2") for f in remaining)
+
+
+def test_book_quote_conversion_uses_book_kind_badge(fix):
+    text, _, _ = fix('> [!bookquote] Fahrenheit 451 — 2026-08-08\n> "line"\n')
+    assert "::: {.lit-quote}" in text
+    assert '<span class="lit-quote-kind">Book</span>' in text
+    assert '<span class="lit-quote-source">Fahrenheit 451</span>' in text
+
+
+def test_poem_and_song_quote_kinds(fix):
+    text, _, _ = fix(
+        '> [!poemquote] Do Not Go Gentle — 2026-08-08\n> "line"\n\n'
+        '> [!songquote] Hurt — 2026-08-09\n> "line two"\n'
+    )
+    assert '<span class="lit-quote-kind">Poem</span>' in text
+    assert '<span class="lit-quote-kind">Song</span>' in text
 
 
 def test_movie_quote_title_html_escaped(fix):

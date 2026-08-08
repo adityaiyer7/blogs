@@ -236,13 +236,17 @@ blockquote {
   font-style: italic;
 }
 
-/* ── Movie quote block ──────────────────────────────────────── */
-/* Rendered from the `[!moviequote]` Obsidian callout by
-   tools/qmd_lint/rules/movie_quote_rules.py (Q1). Deliberately not one of
+/* ── Literature quote block ─────────────────────────────────── */
+/* Rendered from a [!moviequote]/[!bookquote]/[!poemquote]/[!songquote]
+   Obsidian callout by tools/qmd_lint/rules/lit_quote_rules.py (Q1). One
+   shared block for any quoted line worth remembering, whatever it came from
+   — the kind badge is the only thing that varies. Deliberately not one of
    Quarto's five native callout types — a note/tip/warning is de-emphasized
-   admonition chrome, and a remembered line from a movie is the opposite of
-   that, so it gets its own card look instead. */
-.movie-quote {
+   admonition chrome, and a remembered line is the opposite of that, so it
+   gets its own card look instead. The kind badge reuses the same small
+   bordered-uppercase-pill look as .listing-pinned-badge elsewhere on the
+   site, rather than inventing a second badge style. */
+.lit-quote {
   margin: 2rem 0;
   padding: 1.5rem 1.75rem;
   background: #f6f2ea;
@@ -250,27 +254,40 @@ blockquote {
   border-radius: 6px;
 }
 
-.movie-quote-meta {
+.lit-quote-meta {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  gap: 0.6rem;
   font-family: var(--ui-font);
   margin-bottom: 0.75rem;
 }
 
-.movie-quote-title {
+.lit-quote-kind {
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.1rem 0.4rem;
+}
+
+.lit-quote-source {
+  flex: 1;
   font-weight: 600;
   font-size: 0.85rem;
   letter-spacing: 0.02em;
   color: var(--text-secondary);
 }
 
-.movie-quote-date {
+.lit-quote-date {
   font-size: 0.78rem;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
-.movie-quote blockquote {
+.lit-quote blockquote {
   margin: 0;
   padding: 0;
   border-left: none;
@@ -281,7 +298,7 @@ blockquote {
   color: var(--text-primary);
 }
 
-.movie-quote blockquote p:last-child {
+.lit-quote blockquote p:last-child {
   margin-bottom: 0;
 }
 

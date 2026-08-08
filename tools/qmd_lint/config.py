@@ -53,12 +53,20 @@ OBSIDIAN_TO_QUARTO = {
     "bug": "caution",
 }
 
-# The Obsidian callout type for movie-quote entries (rules/movie_quote_rules.py).
-# Deliberately kept separate from OBSIDIAN_TO_QUARTO/QUARTO_CALLOUT_TYPES above:
-# it doesn't convert into one of Quarto's five native callout types, it converts
-# into a bespoke `.movie-quote` fenced div with its own layout, styled in
-# blogposts/styles.css.
-MOVIE_QUOTE_OBSIDIAN_TYPE = "moviequote"
+# Obsidian callout types for the literature-quote block (rules/lit_quote_rules.py):
+# a running log of quoted lines — from a movie, a book, a poem, a song — worth
+# remembering. Deliberately kept separate from OBSIDIAN_TO_QUARTO/
+# QUARTO_CALLOUT_TYPES above: none of these convert into one of Quarto's five
+# native callout types, they convert into a bespoke `.lit-quote` fenced div with
+# its own layout, styled in blogposts/styles.css. The dict value is the display
+# label rendered in the block's kind badge. Add a new kind (e.g. a TV show or a
+# play) by adding one entry here — no other code changes needed.
+LITERATURE_QUOTE_TYPES = {
+    "moviequote": "Movie",
+    "bookquote": "Book",
+    "poemquote": "Poem",
+    "songquote": "Song",
+}
 
 # Where posts live, relative to the repo root (the dir containing pyproject.toml).
 POSTS_GLOB = "blogposts/posts/*/index.qmd"
