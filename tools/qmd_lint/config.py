@@ -53,6 +53,13 @@ OBSIDIAN_TO_QUARTO = {
     "bug": "caution",
 }
 
+# The Obsidian callout type for movie-quote entries (rules/movie_quote_rules.py).
+# Deliberately kept separate from OBSIDIAN_TO_QUARTO/QUARTO_CALLOUT_TYPES above:
+# it doesn't convert into one of Quarto's five native callout types, it converts
+# into a bespoke `.movie-quote` fenced div with its own layout, styled in
+# blogposts/styles.css.
+MOVIE_QUOTE_OBSIDIAN_TYPE = "moviequote"
+
 # Where posts live, relative to the repo root (the dir containing pyproject.toml).
 POSTS_GLOB = "blogposts/posts/*/index.qmd"
 POST_DIR_TEMPLATE = "blogposts/posts/{slug}/index.qmd"

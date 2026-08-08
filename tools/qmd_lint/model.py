@@ -78,6 +78,7 @@ CATEGORY_LABELS = {
     "E": "Obsidian artifacts (E)",
     "F": "Front matter (F)",
     "N": "Obsidian callouts (N)",
+    "Q": "Movie quotes (Q)",
 }
 CATEGORY_ORDER = list(CATEGORY_LABELS.keys())
 

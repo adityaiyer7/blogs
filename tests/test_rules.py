@@ -201,3 +201,26 @@ def test_n6_unclosed_quarto_callout(rule_ids):
 
 def test_n8_unknown_quarto_type(rule_ids):
     assert "N8" in rule_ids("::: {.callout-bogus}\nbody\n:::\n")
+
+
+# --- Category Q: movie quotes -------------------------------------------------
+
+def test_q1_detects_movie_quote_callout(rule_ids):
+    ids = rule_ids('> [!moviequote] The Dark Knight — 2026-08-08\n> "Why so serious?"\n')
+    assert "Q1" in ids
+    assert "Q2" not in ids
+
+
+def test_q2_malformed_title_missing_date(rule_ids):
+    ids = rule_ids('> [!moviequote] The Dark Knight\n> "Why so serious?"\n')
+    assert "Q2" in ids
+
+
+def test_q2_malformed_title_wrong_date_format(rule_ids):
+    ids = rule_ids('> [!moviequote] The Dark Knight — Aug 8 2026\n> "Why so serious?"\n')
+    assert "Q2" in ids
+
+
+def test_q_ignores_other_callout_types(rule_ids):
+    ids = rule_ids("> [!note] Title\n> body\n")
+    assert not ({"Q1", "Q2"} & ids)

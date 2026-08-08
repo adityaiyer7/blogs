@@ -115,6 +115,19 @@ This matters even when the `.qmd` source already looks correct. Quarto decides w
 
 Posts can render source references as academic-style superscript citations (click to jump to a numbered reference list, hover for a preview). This is opt-in per post via `inline-citations: true` in the front matter. See [`citation_instruction_user.md`](citation_instruction_user.md) for the authoring convention, and [`citation_instruction_agent.md`](citation_instruction_agent.md) for the agent that performs the conversion after import.
 
+### Movie Quote Blocks
+
+A running list of movie quotes — the line, the movie, and the date you saw it — gets its own styled block instead of a generic callout. Write each entry in Obsidian as a `[!moviequote]` callout:
+
+```
+> [!moviequote] The Dark Knight — 2026-08-08
+> "Why so serious?"
+```
+
+The title must be `<Movie Title> — <YYYY-MM-DD>`, separated by an em dash (`—`) with a space on each side — the date has to be that exact format, since it's what the conversion uses to split the title back into a movie name and a date. Multi-line quotes just continue with more `>` lines.
+
+`check_post.sh --fix` (and so `sync_post.sh`, which runs it automatically) converts this into a `.movie-quote` fenced div — styled in `blogposts/styles.css` — instead of one of Quarto's five native callout types, so it doesn't share the note/tip/warning chrome used elsewhere on the site. A title that doesn't match the expected format is left unconverted and reported (`Q2`) rather than guessed at. See [`docs/design/movie_quote_block.md`](docs/design/movie_quote_block.md) for the reasoning behind the design.
+
 ### Showing and Hiding Post Sections
 
 The homepage can either list every post in one chronological run, or split posts into four sections by post kind. Which one you get is controlled entirely by `blogposts/_post_visibility.yml`:
@@ -281,7 +294,7 @@ Exporting a post from Obsidian to `.qmd` tends to leave predictable formatting a
 ```
 
 **What it does:**
-1. Reports issues grouped by category (Math, Tables, Structure, Links & images, Obsidian artifacts, Front matter, Obsidian callouts), each with a severity (`ERROR` / `WARN` / `INFO`) and line number.
+1. Reports issues grouped by category (Math, Tables, Structure, Links & images, Obsidian artifacts, Front matter, Obsidian callouts, Movie quotes), each with a severity (`ERROR` / `WARN` / `INFO`) and line number.
 2. If any issues are auto-fixable, it asks `Auto-fix N fixable issue(s)? [y/N]`. Answering `y` applies only the safe, syntactic fixes (trailing whitespace, heading spacing, blank-line normalization, Obsidian-callout conversion, `==highlight==` → `**bold**`, etc.) and re-verifies.
 3. Anything that needs judgment — stray text, wikilinks, unbalanced math, unmapped callout types — is reported but never auto-edited, so no content is lost.
 

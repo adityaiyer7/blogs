@@ -61,6 +61,27 @@ def test_callout_body_delete_beats_same_line_whitespace_fix(fix):
     assert "[!note]" not in text
 
 
+def test_movie_quote_conversion(fix):
+    text, _, remaining = fix('> [!moviequote] The Dark Knight — 2026-08-08\n> "Why so serious?"\n')
+    assert "::: {.movie-quote}" in text
+    assert '<span class="movie-quote-title">The Dark Knight</span>' in text
+    assert '<span class="movie-quote-date">2026-08-08</span>' in text
+    assert '> "Why so serious?"' in text  # quote body kept as a blockquote
+    assert "[!moviequote]" not in text
+    assert not any(f.rule_id in ("Q1", "Q2") for f in remaining)
+
+
+def test_movie_quote_title_html_escaped(fix):
+    text, _, _ = fix('> [!moviequote] Face/Off & <Rescue> — 2026-08-08\n> "line"\n')
+    assert "Face/Off &amp; &lt;Rescue&gt;" in text
+
+
+def test_movie_quote_malformed_title_not_converted(fix):
+    text, _, remaining = fix('> [!moviequote] The Dark Knight\n> "Why so serious?"\n')
+    assert "[!moviequote]" in text  # left untouched for manual handling
+    assert any(f.rule_id == "Q2" for f in remaining)
+
+
 def test_mermaid_fence_conversion(fix):
     text, _, _ = fix("```mermaid\nflowchart TB\n  A --> B\n```\n")
     assert "```{mermaid}" in text

@@ -236,6 +236,55 @@ blockquote {
   font-style: italic;
 }
 
+/* ── Movie quote block ──────────────────────────────────────── */
+/* Rendered from the `[!moviequote]` Obsidian callout by
+   tools/qmd_lint/rules/movie_quote_rules.py (Q1). Deliberately not one of
+   Quarto's five native callout types — a note/tip/warning is de-emphasized
+   admonition chrome, and a remembered line from a movie is the opposite of
+   that, so it gets its own card look instead. */
+.movie-quote {
+  margin: 2rem 0;
+  padding: 1.5rem 1.75rem;
+  background: #f6f2ea;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.movie-quote-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--ui-font);
+  margin-bottom: 0.75rem;
+}
+
+.movie-quote-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.movie-quote-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.movie-quote blockquote {
+  margin: 0;
+  padding: 0;
+  border-left: none;
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+.movie-quote blockquote p:last-child {
+  margin-bottom: 0;
+}
+
 /* ── Tables ──────────────────────────────────────────────────── */
 #quarto-document-content table {
   border: 1px solid var(--bs-table-border-color, var(--border));
