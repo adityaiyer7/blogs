@@ -111,6 +111,33 @@ body {
   margin-bottom: 1.75rem;
 }
 
+/* Series membership, injected into the post header by
+   filters/series_banner.lua. Sits above the reading time, which is why that
+   filter is registered after reading-time.lua. */
+.series-banner {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: -0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.series-banner a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.series-banner a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* The reading time keeps its negative top margin only when it is the first
+   line under the title meta; the banner takes that role when present. */
+.series-banner + .reading-time {
+  margin-top: 0;
+}
+
 /* ── Body text ───────────────────────────────────────────────── */
 p {
   margin-bottom: 1.3rem;
@@ -283,6 +310,42 @@ blockquote {
   border-radius: 2px;
   padding: 0.1rem 0.4rem;
   margin-bottom: 0.4rem;
+}
+
+/* Series membership on a listing card, injected by
+   scripts/inject_listing_badges.py. Deliberately quieter than the Pinned
+   badge: it is context, not emphasis. A card carrying both stacks them, badge
+   first. Never appears on a series landing page, where every card would
+   repeat it. */
+.quarto-listing-default .listing-series-label {
+  font-family: var(--ui-font);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+}
+
+.quarto-listing-default .listing-series-label a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.quarto-listing-default .listing-series-label a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.quarto-listing-default .listing-pinned-badge + .listing-series-label {
+  margin-top: 0.1rem;
+}
+
+/* Explicit empty state for a series landing page with no published members.
+   The post-render injector adds this only to the `series-posts` listing. */
+.series-empty-state {
+  font-family: var(--ui-font);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0 1.5rem;
 }
 
 .quarto-listing-default .listing-date {

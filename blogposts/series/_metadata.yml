@@ -1,0 +1,13 @@
+# Shared settings for every series landing page under this directory.
+#
+# Quarto merges directory metadata into each document below it, so a new series
+# only has to declare its own title, description, and listing (see the snippet
+# in README.md under "Series"). A directory holding just this file renders no
+# page of its own, so this stays inert until the first series exists.
+#
+# Landing pages are navigation, not writing: no comment thread, no table of
+# contents, and no reading-time estimate (reading-time.lua keys off `date`,
+# which these pages deliberately do not carry).
+comments: false
+toc: false
+title-block-banner: false

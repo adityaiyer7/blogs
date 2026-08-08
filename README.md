@@ -181,6 +181,75 @@ So adding `pin-order` to a single post lifts it above the other pins without for
 
 For why it is built this way, see [`docs/document_pins.md`](docs/document_pins.md).
 
+### Series
+
+A **series** is a set of posts meant to be read in a deliberate order — say SVD, then CCA, then CKA. That is a different idea from a category: `categories: [Mathematics]` says what a post is *about*, and many unrelated Mathematics posts will publish alongside a series in progress. Series membership is separate, optional, and independent of publication date.
+
+A post joins a series with three front-matter fields:
+
+```yaml
+---
+title: "Singular Value Decomposition"
+date: 2026-09-01
+kind: explanatory
+categories: [Mathematics]
+
+series-id: representational-geometry
+series: "Representational Geometry from First Principles"
+series-order: 10
+---
+```
+
+- **`series-id`** — lowercase kebab-case. It is both the filter key and the URL, so keep it stable once posts point at it.
+- **`series`** — the title readers see on cards and post pages.
+- **`series-order`** — where the post sits *conceptually*. Nothing to do with when it was published.
+
+**All three or none.** Rule F5 treats a partial or malformed set as an error, and the site render stops before publishing broken labels or links. `series-id` and `series` must be non-empty, single-line strings; use plain text, single quotes, or double quotes. Inline YAML comments are supported. `series-order` must be an unquoted base-10 integer.
+
+Leave gaps — 10, 20, 30 — so a prerequisite can be slotted in later without renumbering. Values are compared as numbers, so `20` correctly precedes `100`.
+
+#### Creating a series landing page
+
+Each series gets a page at `blogposts/series/<series-id>/index.qmd`, reachable at `/series/<series-id>/`. Copy this, changing the title, the description, and both occurrences of the id:
+
+```yaml
+---
+title: "Representational Geometry from First Principles"
+description: "How SVD, CCA, and CKA relate, built up from scratch."
+listing:
+  - id: series-posts
+    contents: ../../posts/*/index.qmd
+    include:
+      series-id: representational-geometry
+    sort: ["series-order asc"]
+    type: default
+    categories: false
+    sort-ui: false
+    filter-ui: false
+    fields: [date, reading-time, title, description]
+---
+```
+
+Keep `contents:` exactly as written. A bare `contents: ../../posts` renders an **empty page with no warning** — that is the first thing to check if a series page comes out blank.
+
+You can create the page before writing any of its posts; it renders the message "No posts in this series have been published yet." After that, adding a post to the series is just the three fields — the page picks it up on the next render and the empty message disappears automatically.
+
+#### Where series membership shows up
+
+**Homepage cards** carry a small linked "Series: …" label. They do **not** reorder: the homepage keeps its usual pinned-then-newest order, in both the single-list and sectioned layouts. A pinned post in a series shows both, badge first.
+
+**Post pages** get a "Series: …" line under the date, linking to the landing page. It is generated from the front matter, so syncing from Obsidian never wipes it.
+
+**The landing page** is the only place conceptual order applies.
+
+#### Publishing out of order, and half-finished series
+
+Both are fine and need no bookkeeping. Publish CKA before CCA and the series page still reads SVD → CCA → CKA once CCA exists; until then it lists what exists. Do not create placeholder posts for unwritten entries. Missing future posts are an incomplete *series* and remain valid; missing fields on a post are malformed *metadata* and stop the render.
+
+**Hidden posts drop out.** If a series post's `kind` is disabled in `_post_visibility.yml`, it disappears from its series page along with everywhere else — no gap, no placeholder. The remaining posts keep their order. Re-enable the section and it returns.
+
+For why it is built this way, see [`docs/design/series.md`](docs/design/series.md).
+
 ### Deleting Blog Posts
 
 If you want to fully delete a post from your repository, do **not** just delete the source folder, as the generated `.html` files will be left behind in the `docs/` folder. Instead, use the included deletion script:

@@ -3,10 +3,11 @@ project:
   output-dir: docs
   pre-render:
     - python3 scripts/update_post_visibility.py
-  # Adds the "Pinned" badge to listing cards. Ordering is handled natively by
-  # the listing sort; only the badge needs post-processing (see the script).
+  # Adds the "Pinned" badge and the series label to listing cards. Ordering is
+  # handled natively by the listing sorts; only the labels need
+  # post-processing (see the script).
   post-render:
-    - python3 scripts/inject_pin_badges.py
+    - python3 scripts/inject_listing_badges.py
 
 metadata-files:
   - _links.yml
@@ -29,6 +30,11 @@ filters:
   # the page. Emptying disabled listings is handled by the sections-active gate
   # in _hidden_posts.yml instead.
   - filters/post_visibility.lua
+  # Links a series post back to its landing page (see filters/series_banner.lua).
+  # Registered *after* reading-time.lua on purpose: both insert at block 1, so
+  # the later filter's block ends up on top, which is what puts the series
+  # banner above the reading-time line.
+  - filters/series_banner.lua
 
 # Render the native listing reading-time string as "N min read" (default is
 # "N min") so listing cards and post pages read identically.

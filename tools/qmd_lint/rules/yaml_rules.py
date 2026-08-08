@@ -5,6 +5,8 @@ from __future__ import annotations
 import datetime as _dt
 import re
 
+from tools.series_metadata import parse_series_metadata
+
 from ..config import REQUIRED_FRONT_MATTER_KEYS
 from ..model import Finding, Severity, rule
 from ..parser import Document
@@ -66,3 +68,16 @@ def f4_categories_list(doc: Document) -> list[Finding]:
     if not isinstance(doc.front_matter["categories"], list):
         return [Finding("F4", Severity.WARNING, _fm_start(doc), "categories should be a list, e.g. [AI, Math]")]
     return []
+
+
+@rule("F5", "F", Severity.ERROR)
+def f5_series_metadata(doc: Document) -> list[Finding]:
+    """Require complete, render-safe metadata whenever a post joins a series."""
+    if doc.front_matter_raw is None:
+        return []
+
+    _, errors = parse_series_metadata(doc.front_matter_raw)
+    return [
+        Finding("F5", Severity.ERROR, _fm_start(doc), str(error))
+        for error in errors
+    ]

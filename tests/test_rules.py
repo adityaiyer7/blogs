@@ -106,6 +106,81 @@ def test_f_clean_front_matter_ok(rule_ids):
     assert "F1" not in rule_ids("# Heading\n")
 
 
+def _series_ids(write_qmd, front_matter: str) -> set[str]:
+    return {finding.rule_id for finding in _series_findings(write_qmd, front_matter)}
+
+
+def _series_findings(write_qmd, front_matter: str):
+    from tools.qmd_lint.engine import collect_findings
+    from tools.qmd_lint.parser import parse
+
+    body = f'---\ntitle: "T"\ndate: 2026-06-18\ncategories: [Test]\n{front_matter}---\n\n# H\n'
+    path = write_qmd(body, with_front_matter=False)
+    return collect_findings(parse(path))
+
+
+_COMPLETE_SERIES = 'series-id: representational-geometry\nseries: "RG"\nseries-order: 10\n'
+
+
+def test_f5_complete_series_metadata_is_clean(write_qmd):
+    assert "F5" not in _series_ids(write_qmd, _COMPLETE_SERIES)
+
+
+def test_f5_no_series_metadata_is_clean(write_qmd):
+    assert "F5" not in _series_ids(write_qmd, "")
+
+
+def test_f5_partial_series_metadata(write_qmd):
+    from tools.qmd_lint.model import Severity
+
+    findings = [
+        finding
+        for finding in _series_findings(
+            write_qmd, 'series: "RG"\nseries-order: 10\n'
+        )
+        if finding.rule_id == "F5"
+    ]
+    assert findings
+    assert all(finding.severity == Severity.ERROR for finding in findings)
+
+
+def test_f5_non_kebab_series_id(write_qmd):
+    assert "F5" in _series_ids(
+        write_qmd, 'series-id: Representational Geometry\nseries: "RG"\nseries-order: 10\n'
+    )
+
+
+def test_f5_non_integer_series_order(write_qmd):
+    assert "F5" in _series_ids(
+        write_qmd, 'series-id: rg\nseries: "RG"\nseries-order: "10"\n'
+    )
+
+
+@pytest.mark.parametrize(
+    "front_matter",
+    [
+        "series-id:\nseries:\nseries-order:\n",
+        "series-id: rg\nseries: null\nseries-order: 10\n",
+        "series-id: rg\nseries: RG\nseries-order: true\n",
+        "series-id: rg\nseries: RG\nseries-order: 10.5\n",
+        "series-id: rg\nseries: [RG]\nseries-order: 10\n",
+    ],
+)
+def test_f5_rejects_blank_null_collection_and_non_integer_values(
+    write_qmd, front_matter
+):
+    assert "F5" in _series_ids(write_qmd, front_matter)
+
+
+def test_f5_accepts_inline_comments_and_quoted_titles(write_qmd):
+    front_matter = (
+        "series-id: representational-geometry # stable URL\n"
+        'series: "Representational \\"Geometry\\"" # display title\n'
+        "series-order: 10 # conceptual order\n"
+    )
+    assert "F5" not in _series_ids(write_qmd, front_matter)
+
+
 # --- Category N: obsidian callouts ------------------------------------------
 
 def test_n1_detects_obsidian_callout(rule_ids):

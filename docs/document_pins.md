@@ -111,9 +111,13 @@ Quarto's feed generation changes.
 
 ### D5 — The badge is injected after render, not rendered by a custom template
 
-**Decision.** `blogposts/scripts/inject_pin_badges.py` runs as a Quarto
+**Decision.** `blogposts/scripts/inject_listing_badges.py` runs as a Quarto
 `post-render` step and inserts one `<div class="listing-pinned-badge">Pinned</div>`
 into the cards of pinned posts. Styling lives in `blogposts/styles.css`.
+
+> **Renamed.** This script was `inject_pin_badges.py` until #35, which
+> generalized it to inject series labels from the same pass rather than adding
+> a second script — see the resolved follow-up at the end of this decision.
 
 **This deviates from #24**, which proposed a custom EJS listing template. The
 deviation is deliberate and is the one judgement call in this change worth
@@ -148,12 +152,15 @@ is limited to the `quarto-post` wrapper and the post link inside it.
 that it can silently stop matching. So the script raises if a page contains
 `quarto-post` markup but yields no parsed cards, which is what a Quarto markup
 change would look like. It is also idempotent, so reprocessing cannot
-double-badge. Both behaviours are covered in `tests/test_pin_badges.py`.
+double-badge. Both behaviours are covered in `tests/test_listing_badges.py`.
 
-**If this is revisited.** The natural trigger is #35: if a custom template
-gets built for series labels anyway, the badge should move into it rather than
-two mechanisms coexisting. #24 makes the same point in reverse — do not build
-two separate templates for the same cards.
+**Follow-up, now resolved.** The open question here was #35: if a custom
+template got built for series labels anyway, the badge should move into it
+rather than two mechanisms coexisting. #35 built no template — the same
+reasoning above ruled it out a second time — so the badge stayed, and the
+series label joined it in a single generalized pass. One `CARD_RE`, one guard,
+one place to fix when Quarto's card markup moves. See
+[`docs/design/series.md`](design/series.md) D3.
 
 ### D6 — Shipped with nothing pinned
 
@@ -180,9 +187,12 @@ appeared in no listing and received no badge.
 apply independently inside each kind, and the fixed section order is
 unaffected because it comes from document structure, not from the listings.
 
-**Out of scope.** Series listings (#35) are not pinned — a series is
-sequential and ordered by `series-order asc`. Pin metadata and series metadata
-may coexist on a post. Reader-controlled pin toggling is #41.
+**Series listings are not pinned.** A series landing page is sequential, ordered
+by `series-order asc`; the pin sort does not apply there. Pin metadata and
+series metadata do coexist on a post, and a card carrying both shows the badge
+above the series label. The badge is still rendered on series landing pages —
+see `docs/design/series.md` D5 for why that was a close call. Reader-controlled
+pin toggling is #41.
 
 ## Verification performed
 
