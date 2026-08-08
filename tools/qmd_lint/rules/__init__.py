@@ -2,6 +2,7 @@
 
 from . import (  # noqa: F401
     link_rules,
+    lit_quote_rules,
     math_rules,
     note_rules,
     obsidian_rules,
